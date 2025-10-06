@@ -328,7 +328,7 @@ By selecting "Accept," you acknowledge that the climate data provided through th
         st.stop()
 
     # Display options
-    with st.sidebar.expander("🎨 Display Options", expanded=False):
+    with st.sidebar.expander("🎨 Display Options", expanded=True):
         mode = st.radio(
             "Display Mode",
             ["Values", "Baseline (start year)", f"Deltas vs {BASE_LABEL}"],

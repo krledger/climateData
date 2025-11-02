@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+<Document>
+    <name>Ravenswood Grid Cell - All Scenarios</name>
+    <description>
+        Actual grid cell used for Ravenswood point extraction
+        Model: access_cm2
+        Scenario: All Scenarios
+    </description>
+
+    <Style id="targetStyle">
+        <IconStyle>
+            <color>ffff0000</color><scale>1.5</scale>
+            <Icon><href>http://maps.google.com/mapfiles/kml/shapes/target.png</href></Icon>
+        </IconStyle>
+        <LabelStyle><color>ffffffff</color><scale>1.2</scale></LabelStyle>
+    </Style>
+    <Style id="centreStyle">
+        <IconStyle>
+            <color>ff00ff00</color><scale>1.2</scale>
+            <Icon><href>http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png</href></Icon>
+        </IconStyle>
+        <LabelStyle><color>ffffffff</color><scale>1.0</scale></LabelStyle>
+    </Style>
+    <Style id="cellStyle">
+        <LineStyle><color>ff00ff00</color><width>3</width></LineStyle>
+        <PolyStyle><color>4400ff00</color></PolyStyle>
+    </Style>
+
+    <Folder>
+        <name>Ravenswood Extraction</name>
+
+        <Placemark>
+            <name>Target Point</name>
+            <description>Requested: -20.115000°, 146.900000°</description>
+            <styleUrl>#targetStyle</styleUrl>
+            <Point>
+                <coordinates>146.9,-20.115,0</coordinates>
+            </Point>
+        </Placemark>
+
+        <Placemark>
+            <name>Cell Centre</name>
+            <description>
+Actual: -20.625000°, 147.187500°
+Grid indices: [19, 19]
+Offset: -0.510000° lat, +0.287500° lon
+            </description>
+            <styleUrl>#centreStyle</styleUrl>
+            <Point>
+                <coordinates>147.1875,-20.625,0</coordinates>
+            </Point>
+        </Placemark>
+
+        <Placemark>
+            <name>Actual Grid Cell</name>
+            <description>
+Model: access_cm2
+Grid indices: [19, 19]
+Centre: -20.625000°, 147.187500°
+Bounds: -21.250000° to -20.000000° (lat)
+        146.250000° to 148.125000° (lon)
+Size: ~138.8 × ~194.8 km
+Area: ~27026 km²
+
+ALL Ravenswood metrics extracted from this cell
+            </description>
+            <styleUrl>#cellStyle</styleUrl>
+            <Polygon>
+                <extrude>0</extrude>
+                <altitudeMode>clampToGround</altitudeMode>
+                <outerBoundaryIs>
+                    <LinearRing>
+                        <coordinates>
+                            146.25,-20.0,0
+                            148.125,-20.0,0
+                            148.125,-21.25,0
+                            146.25,-21.25,0
+                            146.25,-20.0,0
+                        </coordinates>
+                    </LinearRing>
+                </outerBoundaryIs>
+            </Polygon>
+        </Placemark>
+
+    </Folder>
+</Document>
+</kml>

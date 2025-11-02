@@ -1,12 +1,12 @@
 {
-  "created": "2025-11-02T09:30:18Z",
+  "created": "2025-11-02T09:30:21Z",
   "source": "metrics_from_parquet_multi",
   "input": {
     "file": "raw_daily.parquet",
     "temporal_resolution": "daily"
   },
   "parquet": {
-    "path": "/Users/ken/PycharmProjects/climateData/metricsDataFiles/SSP1-26/metrics.parquet",
+    "path": "/Users/ken/PycharmProjects/climateData/metricsDataFiles/SSP2-45/metrics.parquet",
     "compression": "zstd"
   },
   "data_layout": {
@@ -46,7 +46,7 @@
         "non_null": 15516,
         "nulls": 0,
         "min": 0.0,
-        "max": 1192.6631992782548
+        "max": 1574.0455213347796
       }
     ],
     "rows": 15516

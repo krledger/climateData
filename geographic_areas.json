@@ -1,0 +1,74 @@
+{
+  "areas": {
+    "Global": {
+      "description": "Entire Earth (no spatial subsetting)",
+      "bbox": null,
+      "note": "Downloads complete global grid - much slower"
+    },
+    "Australia": {
+      "description": "Continental Australia",
+      "bbox": {
+        "north": -10,
+        "west": 110,
+        "south": -45,
+        "east": 155
+      },
+      "note": "Recommended for Australian studies"
+    },
+    "Queensland": {
+      "description": "Queensland state",
+      "bbox": {
+        "north": -10,
+        "west": 138,
+        "south": -29,
+        "east": 154
+      }
+    },
+    "New_South_Wales": {
+      "description": "New South Wales state",
+      "bbox": {
+        "north": -28,
+        "west": 141,
+        "south": -38,
+        "east": 154
+      }
+    },
+    "Victoria": {
+      "description": "Victoria state",
+      "bbox": {
+        "north": -34,
+        "west": 141,
+        "south": -39,
+        "east": 150
+      }
+    },
+    "Southeast_Australia": {
+      "description": "NSW, VIC, TAS region",
+      "bbox": {
+        "north": -28,
+        "west": 140,
+        "south": -44,
+        "east": 154
+      }
+    }
+  },
+  "points_of_interest": {
+    "Ravenswood": {
+      "description": "Ravenswood, QLD - Primary extraction point",
+      "lat": -20.115,
+      "lon": 146.9,
+      "grid_cell_estimate": {
+        "lat_spacing": 1.25,
+        "lon_spacing": 1.875,
+        "note": "Based on ACCESS-CM2 grid resolution"
+      }
+    }
+  },
+  "metadata": {
+    "version": "1.0",
+    "created": "2025-01-01",
+    "coordinate_system": "WGS84",
+    "bbox_format": "north, west, south, east (decimal degrees)",
+    "note": "Add custom areas as needed - they will appear in importer menu"
+  }
+}

@@ -1,12 +1,12 @@
 {
-  "created": "2025-11-02T09:30:18Z",
+  "created": "2025-11-02T09:30:35Z",
   "source": "metrics_from_parquet_multi",
   "input": {
     "file": "raw_daily.parquet",
     "temporal_resolution": "daily"
   },
   "parquet": {
-    "path": "/Users/ken/PycharmProjects/climateData/metricsDataFiles/SSP1-26/metrics.parquet",
+    "path": "/Users/ken/PycharmProjects/climateData/metricsDataFiles/historical/metrics.parquet",
     "compression": "zstd"
   },
   "data_layout": {
@@ -19,15 +19,15 @@
       {
         "name": "Year",
         "dtype": "int64",
-        "non_null": 15516,
+        "non_null": 29736,
         "nulls": 0,
-        "min": 2015.0,
-        "max": 2101.0
+        "min": 1850.0,
+        "max": 2015.0
       },
       {
         "name": "Season",
         "dtype": "object",
-        "non_null": 15516,
+        "non_null": 29736,
         "nulls": 0,
         "min": null,
         "max": null
@@ -35,7 +35,7 @@
       {
         "name": "Data Type",
         "dtype": "object",
-        "non_null": 15516,
+        "non_null": 29736,
         "nulls": 0,
         "min": null,
         "max": null
@@ -43,12 +43,12 @@
       {
         "name": "Value",
         "dtype": "float64",
-        "non_null": 15516,
+        "non_null": 29736,
         "nulls": 0,
         "min": 0.0,
-        "max": 1192.6631992782548
+        "max": 1292.343532331408
       }
     ],
-    "rows": 15516
+    "rows": 29736
   }
 }

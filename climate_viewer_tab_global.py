@@ -266,61 +266,22 @@ def render_global_tab(
         )
 
     st.markdown("<h4 style='margin:8px 0 5px 0;'>📅 Year When 1.5°C Global Warming Is Reached</h4>", unsafe_allow_html=True)
-    # Create HTML table with proper text wrapping
-    html = """
-    <style>
-    .comparison-table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 0.85em;
-        margin: 8px 0;
-    }
-    .comparison-table th {
-        background: #f0f2f6;
-        padding: 8px 10px;
-        text-align: left;
-        border: 1px solid #e0e0e0;
-        font-weight: 600;
-        font-size: 0.9em;
-    }
-    .comparison-table td {
-        padding: 8px 10px;
-        border: 1px solid #e0e0e0;
-        vertical-align: top;
-    }
-    .comparison-table .reasoning-col {
-        word-wrap: break-word;
-        white-space: normal;
-        line-height: 1.4;
-    }
-    .comparison-table .year-col {
-        text-align: center;
-        white-space: nowrap;
-    }
-    </style>
-    <table class="comparison-table">
-    <tr>
-        <th style="width: 120px;">Scenario</th>
-        <th style="width: 180px;">Compliance</th>
-        <th class="reasoning-col">Compliance Reasoning</th>
-    """
-
-    for loc in selected_locations:
-        html += f"    <th class='year-col' style='width: 80px;'>{loc}</th>\n"
-    html += "</tr>\n"
-
-    for _, row in comparison_df.iterrows():
-        html += "<tr>\n"
-        html += f"    <td>{row['Scenario']}</td>\n"
-        html += f"    <td>{row['Compliance']}</td>\n"
-        html += f"    <td class='reasoning-col'>{row['Description']}</td>\n"
-        for loc in selected_locations:
-            html += f"    <td class='year-col'>{row[loc]}</td>\n"
-        html += "</tr>\n"
-
-    html += "</table>"
-
-    st.markdown(html, unsafe_allow_html=True)
+    st.dataframe(
+        comparison_df,
+        column_config={
+            "Scenario": st.column_config.TextColumn("Scenario", width="medium"),
+            "Compliance": st.column_config.TextColumn("Compliance", width="medium"),
+            "Description": st.column_config.TextColumn(
+                "Compliance Reasoning",
+                width="large",
+                help="Explanation of why scenario is assessed as compliant, warning, or non-compliant based on Paris Agreement temperature goals"
+            ),
+            **{loc: st.column_config.NumberColumn(loc, format="%d", width="small")
+               for loc in selected_locations}
+        },
+        hide_index=True,
+        use_container_width=True
+    )
 
     st.markdown(f"""
     <div style='font-size: 0.75em; color: #666; margin: 5px 0;'>

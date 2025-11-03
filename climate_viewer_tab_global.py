@@ -25,25 +25,93 @@ from climate_viewer_utils import (
 )
 
 
-def get_compliance_status(scenario):
+def assess_scenario_compliance(scenario: str, crossing_year: int = None) -> tuple:
     """
-    Determine compliance status for scenario.
+    Assess Paris Agreement compliance for a scenario.
     
+    Paris Agreement Article 2.1.a aims to hold "the increase in the global 
+    average temperature to well below 2°C above pre-industrial levels and 
+    pursuing efforts to limit the temperature increase to 1.5°C".
+    
+    Args:
+        scenario: Scenario name (e.g., "SSP1-26", "SSP5-85")
+        crossing_year: Year when 1.5°C is sustainably exceeded (or None)
+        
     Returns:
-        tuple: (status_text, color) where status is 'Compliant', 'Warning', or 'Non-Compliant'
+        Tuple of (status_with_emoji, reasoning):
+        - status_with_emoji: "🟢 Compliant" or similar with emoji
+        - reasoning: Explanation of compliance assessment
     """
-    if "SSP1-26" in scenario or "1-26" in scenario:
-        return "✅ Compliant (Best case)", "🟢"
-    elif "SSP1-1.9" in scenario or "1-1.9" in scenario:
-        return "✅ Compliant (Best case)", "🟢"
-    elif "SSP2-45" in scenario or "2-45" in scenario:
-        return "⚠️ Warning (Middle pathway)", "🟡"
-    elif "SSP3-70" in scenario or "3-70" in scenario:
-        return "✅ Compliant (Worst case)", "🟢"
-    elif "SSP5-85" in scenario or "5-85" in scenario:
-        return "❌ Non-Compliant", "🔴"
+    scenario_upper = scenario.upper()
+    
+    # SSP1-1.9: Limits warming to 1.5°C with no or limited overshoot
+    if "SSP1-1.9" in scenario_upper or "1-1.9" in scenario_upper:
+        return (
+            "🟢 Compliant (Best Case)",
+            "Limits warming to 1.5°C with no or limited overshoot. "
+            "Represents ambitious mitigation aligned with Paris Agreement's "
+            "aspirational 1.5°C target."
+        )
+    
+    # SSP1-2.6: Limits warming to well below 2°C
+    if "SSP1-26" in scenario_upper or "SSP1-2.6" in scenario_upper or "1-26" in scenario_upper:
+        year_text = f"Reaches 1.5°C around {crossing_year}" if crossing_year else "Crosses 1.5°C in early 2030s"
+        return (
+            "🟢 Compliant",
+            f"Peak warming stays well below 2°C through strong and sustained mitigation. "
+            f"Consistent with Paris Agreement's core temperature goal. "
+            f"{year_text} but stabilises below 2°C."
+        )
+    
+    # SSP2-4.5: Middle pathway, warming around 2-2.5°C
+    if "SSP2-45" in scenario_upper or "SSP2-4.5" in scenario_upper or "2-45" in scenario_upper:
+        return (
+            "🟡 Warning",
+            "Peak warming likely exceeds 2°C. Represents intermediate pathway "
+            "with moderate climate action. May exceed Paris Agreement's 'well below 2°C' "
+            "objective. Useful for assessing risks under delayed mitigation."
+        )
+    
+    # SSP3-7.0: Regional rivalry, warming 2.5-3.5°C
+    if "SSP3-70" in scenario_upper or "SSP3-7.0" in scenario_upper or "3-70" in scenario_upper:
+        year_text = f"Crosses 1.5°C early (around {crossing_year})" if crossing_year else "Crosses 1.5°C in mid-2020s"
+        return (
+            "🟢 Compliant (Worst Case)",
+            f"Represents upper bound of scenarios for stress testing resilience and "
+            f"adaptation capacity. {year_text}. While warming exceeds 2°C, "
+            f"used to test outer limits of physical climate risks and evaluate "
+            f"adaptation requirements under challenging conditions."
+        )
+    
+    # SSP5-8.5: High emissions, warming >4°C
+    if "SSP5-85" in scenario_upper or "SSP5-8.5" in scenario_upper or "5-85" in scenario_upper:
+        return (
+            "🔴 Non-Compliant",
+            "High emissions pathway with warming well exceeding 2°C threshold. "
+            "Peak warming >4°C by end of century represents failure to achieve "
+            "Paris Agreement goals. Used as high-risk reference scenario for "
+            "stress testing extreme physical climate impacts."
+        )
+    
+    # Default for unknown scenarios
+    if crossing_year and crossing_year < 2030:
+        return (
+            "🟡 Warning",
+            f"Crosses 1.5°C threshold in {crossing_year}. Compliance depends on "
+            "peak warming level and long-term trajectory. Further analysis required."
+        )
+    elif crossing_year is None:
+        return (
+            "🟢 Compliant",
+            "Does not exceed 1.5°C global warming within projection period. "
+            "Represents strong mitigation consistent with Paris Agreement."
+        )
     else:
-        return "⚠️ Unknown", "🟡"
+        return (
+            "🟡 Warning",
+            f"Crosses 1.5°C in {crossing_year}. Compliance assessment requires "
+            "additional information on peak warming and long-term pathway."
+        )
 
 
 def render_global_tab(
@@ -155,21 +223,30 @@ def render_global_tab(
     
     # Display comparison table (always show, even for single location)
     st.markdown(f"""
-    **Regulatory Context (Australian Corporations Act):**
+    **Regulatory Context:**
     
-    Climate-related financial disclosures must include scenario analysis using:
-    - **SSP1-26**: Paris Agreement pathway (limited to 1.5°C) - *Best case*
-    - **SSP3-70** or higher: Well exceeds 2°C pathway - *Worst case*
+    **Low warming scenario (≤1.5°C)**: Represents strong global climate action, high transition risk, lower physical risk, aligned with Paris Agreement targets.
+    
+    **High warming scenario (≥2.5°C)**: Represents limited or delayed climate action, lower transition risk, higher physical risk, temperature increase "well exceeds" 2°C threshold.
     """)
     
     # Create comparison table
     comparison_data = []
     for scenario in global_scenarios:
-        row = {"Scenario": scenario}
-        compliance_status, compliance_color = get_compliance_status(scenario)
-        row["Compliance"] = f"{compliance_color} {compliance_status}"
-        row["Description"] = get_scenario_description(scenario)
+        # Get crossing year for compliance assessment (use first location as reference)
+        crossing_year = None
+        if selected_locations and selected_locations[0] in all_location_results:
+            if scenario in all_location_results[selected_locations[0]]:
+                crossing_year = all_location_results[selected_locations[0]][scenario].get("year")
         
+        # Assess compliance using algorithm
+        status_with_emoji, reasoning = assess_scenario_compliance(scenario, crossing_year)
+        
+        row = {"Scenario": scenario}
+        row["Compliance"] = status_with_emoji
+        row["Description"] = reasoning  # Compliance reasoning instead of scenario description
+        
+        # Add location columns
         for location in selected_locations:
             if location in all_location_results and scenario in all_location_results[location]:
                 year = all_location_results[location][scenario]["year"]
@@ -194,8 +271,12 @@ def render_global_tab(
         comparison_df,
         column_config={
             "Scenario": st.column_config.TextColumn("Scenario", width="medium"),
-            "Compliance": st.column_config.TextColumn("Compliance", width="large"),
-            "Description": st.column_config.TextColumn("Description", width="large"),
+            "Compliance": st.column_config.TextColumn("Compliance", width="medium"),
+            "Description": st.column_config.TextColumn(
+                "Compliance Reasoning",
+                width="large",
+                help="Explanation of why scenario is assessed as compliant, warning, or non-compliant based on Paris Agreement temperature goals"
+            ),
             **{loc: st.column_config.NumberColumn(loc, format="%d", width="small") 
                for loc in selected_locations}
         },
@@ -204,9 +285,13 @@ def render_global_tab(
     )
     
     st.caption(f"""
-    **Methodology:** Regional warming calculated for each location using pre-industrial baseline (1850-1900).  
+    **Methodology:** Regional warming calculated for each location using pre-industrial baseline ({BASELINE_PERIOD[0]}-{BASELINE_PERIOD[1]}).  
     Global warming estimated by dividing regional warming by {AMPLIFICATION_FACTOR}× amplification factor.  
-    Year shown is when 5-year rolling average first exceeds 1.5°C global warming threshold.
+    Year shown is when threshold is first crossed **and sustained** (at least 3 of the next 5 years also exceed).
+    
+    **Compliance Assessment:** Scenarios evaluated against Paris Agreement Article 2.1.a goals:
+    (1) hold warming well below 2°C, and (2) pursue efforts to limit to 1.5°C. 
+    Description column explains compliance reasoning based on crossing timing and warming trajectory.
     """)
     
     # Display baseline information
@@ -240,7 +325,7 @@ def render_global_tab(
             year = data["year"]
             
             # Get compliance status
-            compliance_status, compliance_color = get_compliance_status(scenario)
+            status_with_emoji, _ = assess_scenario_compliance(scenario, year)
             
             # Header box with compliance indicator
             st.markdown(
@@ -254,7 +339,7 @@ def render_global_tab(
                         <strong>Regional warming:</strong> {regional_temp:.2f}°C above pre-industrial
                     </p>
                     <p style='font-size: 16px; margin: 10px 0 0 0;'>
-                        <strong>Compliance Status:</strong> {compliance_status}
+                        <strong>Compliance Status:</strong> {status_with_emoji}
                     </p>
                 </div>
                 """,

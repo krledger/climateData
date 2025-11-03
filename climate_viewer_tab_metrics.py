@@ -223,7 +223,7 @@ def render_metrics_tab(st, ns, loc_sel, scen_sel, type_sel, name_sel, season_sel
                 .mark_rule(color="red", strokeDash=[5, 5], strokeWidth=2)
                 .encode(
                     y=alt.Y("temp:Q"),
-                    tooltip=alt.value(f"🎯 global warming target regional: {reference_temp:°C)}")
+                    tooltip=alt.value(f"🎯 1.5°C global warming target)")
                 )
             )
             chart_layers.append(reference_line)

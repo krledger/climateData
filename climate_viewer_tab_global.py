@@ -135,6 +135,21 @@ def render_global_tab(
         label_to_path: Mapping of label to file path
         load_metrics_func: Function to load metrics (NOT CACHED)
     """
+    # Add custom CSS to reduce metric font sizes
+    st.markdown("""
+    <style>
+    [data-testid="stMetricValue"] {
+        font-size: 1.5rem !important;  /* Main value (was ~2rem) */
+    }
+    [data-testid="stMetricDelta"] {
+        font-size: 0.9rem !important;  /* Delta text (was ~1rem) */
+    }
+    [data-testid="stMetricLabel"] {
+        font-size: 0.8rem !important;  /* Label text */
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
     st.markdown("## 🌍 Global 1.5°C Impact Display")
 
     st.markdown(f"""
@@ -342,7 +357,7 @@ def render_global_tab(
 
             # Display metrics by category (Dashboard style) with SWAPPED values
             for category, metrics in DASHBOARD_METRICS.items():
-                st.markdown(f"<div style='font-size: 0.9em; font-weight: 600; margin: 8px 0 4px 0;'>{category}</div>", unsafe_allow_html=True)
+                st.markdown(f"<div style='font-size: 1.5em; font-weight: 600; margin: 8px 0 4px 0;'>{category}</div>", unsafe_allow_html=True)
 
                 # Create columns for metrics in this category
                 cols = st.columns(len(metrics))

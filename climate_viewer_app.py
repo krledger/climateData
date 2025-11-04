@@ -74,7 +74,7 @@ def run_metrics_viewer():
     scenarios = discover_scenarios(base_folder)
     
     if not scenarios:
-        st.error(f"Ã¢ÂÅ’ No scenarios found in: {base_folder}")
+        st.error("No scenarios found in: {base_folder}")
         st.stop()
     
     labels = [lbl for lbl, _, _ in scenarios]

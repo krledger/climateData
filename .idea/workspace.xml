@@ -6,6 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="119e569a-41fe-47f1-a99d-3a7d4fc7979f" name="Changes" comment="Updated expanders">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/climate_viewer_app.py" beforeDir="false" afterPath="$PROJECT_DIR$/climate_viewer_app.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/climate_viewer_tab_global.py" beforeDir="false" afterPath="$PROJECT_DIR$/climate_viewer_tab_global.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -236,7 +237,8 @@
       <workItem from="1762028628494" duration="15237000" />
       <workItem from="1762117320088" duration="4004000" />
       <workItem from="1762131215959" duration="5858000" />
-      <workItem from="1762147945869" duration="8846000" />
+      <workItem from="1762147945869" duration="9118000" />
+      <workItem from="1762210952407" duration="1317000" />
     </task>
     <task id="LOCAL-00001" summary="Updated expanders">
       <option name="closed" value="true" />
@@ -310,7 +312,23 @@
       <option name="project" value="LOCAL" />
       <updated>1762208705203</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="Updated expanders">
+      <option name="closed" value="true" />
+      <created>1762210224948</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1762210224948</updated>
+    </task>
+    <task id="LOCAL-00011" summary="Updated expanders">
+      <option name="closed" value="true" />
+      <created>1762210255916</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1762210255916</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -327,7 +345,7 @@
     <SUITE FILE_PATH="coverage/climateData$Amplification.coverage" NAME="Amplification Coverage Results" MODIFIED="1762146396749" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/climateData$streamlitClimateViewer.coverage" NAME="streamlitClimateViewer Coverage Results" MODIFIED="1759442167996" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/climateData$climateScenarioViewer.coverage" NAME="climateScenarioViewer Coverage Results" MODIFIED="1762129645246" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/climateData$NewClimateViewer.coverage" NAME="NewClimateViewer Coverage Results" MODIFIED="1762210123736" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/climateData$NewClimateViewer.coverage" NAME="NewClimateViewer Coverage Results" MODIFIED="1762212453326" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/climateData$climateCMIP6Importer.coverage" NAME="climateCMIP6Importer Coverage Results" MODIFIED="1762067768992" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/climateData$climate_viewer_tab_global.coverage" NAME="climate_viewer_tab_global Coverage Results" MODIFIED="1762146569065" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/climateData$climateMetricsGenerator.coverage" NAME="climateMetricsGenerator Coverage Results" MODIFIED="1762075806462" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />

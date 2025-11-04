@@ -56,12 +56,12 @@ def render_dashboard_tab(
         long_start: Long-term horizon start year
         horizon_end: End of long-term horizon
     """
-    st.title("📊 Climate Change Dashboard")
+    st.title("ðŸ“Š Climate Change Dashboard")
     
     dashboard_scenarios = [s for s in scen_sel if "historical" not in s.lower()]
     
     if not dashboard_scenarios:
-        st.warning("âš ï¸ Please select at least one future scenario (excluding historical) to view dashboard.")
+        st.warning("Ã¢Å¡Â Ã¯Â¸Â Please select at least one future scenario (excluding historical) to view dashboard.")
         st.stop()
     
     dashboard_location = st.selectbox(
@@ -74,8 +74,25 @@ def render_dashboard_tab(
     kml_path = os.path.join(BASE_DIR, "Australia_grid_coverage.kml")
     ravenswood_kml_path = os.path.join(BASE_DIR, "Ravenswood_grid_cell.kml")
     
+    # Diagnostic information (remove after debugging)
+    with st.expander("🔍 Map Diagnostic Info", expanded=False):
+        st.write(f"**FOLIUM_AVAILABLE:** {FOLIUM_AVAILABLE}")
+        st.write(f"**BASE_DIR:** {BASE_DIR}")
+        st.write(f"**KML path:** {kml_path}")
+        st.write(f"**KML exists:** {os.path.exists(kml_path)}")
+        st.write(f"**Ravenswood path:** {ravenswood_kml_path}")
+        st.write(f"**Ravenswood exists:** {os.path.exists(ravenswood_kml_path)}")
+        
+        # List files in BASE_DIR
+        try:
+            files = os.listdir(BASE_DIR)
+            kml_files = [f for f in files if f.endswith('.kml')]
+            st.write(f"**KML files in BASE_DIR:** {kml_files if kml_files else 'None found'}")
+        except Exception as e:
+            st.write(f"**Error listing files:** {str(e)}")
+    
     if FOLIUM_AVAILABLE and os.path.exists(kml_path):
-        with st.expander("🗺️ Region Map", expanded=False):
+        with st.expander("ðŸ—ºï¸Â Region Map", expanded=False):
             st.markdown("**Grid coverage area for climate metrics**")
             region_map, status_msg, placemark_count = create_region_map(
                 kml_path,
@@ -83,14 +100,14 @@ def render_dashboard_tab(
             )
             if region_map:
                 if placemark_count > 0:
-                    st.caption(f"âœ“ Displaying {placemark_count} grid cells from KML file")
+                    st.caption(f"Ã¢Å“â€œ Displaying {placemark_count} grid cells from KML file")
                 elif "Partial" in status_msg:
-                    st.warning(f"âš ï¸ {status_msg}")
+                    st.warning(f"Ã¢Å¡Â Ã¯Â¸Â {status_msg}")
                 st_folium(region_map, width=1100, height=600)
             else:
                 st.info(f"Map unavailable: {status_msg}")
     elif not FOLIUM_AVAILABLE:
-        st.info("ðŸ“¦ Install folium and streamlit-folium to view region map: `pip install folium streamlit-folium`")
+        st.info("Ã°Å¸â€œÂ¦ Install folium and streamlit-folium to view region map: `pip install folium streamlit-folium`")
     
     # Prepare dashboard data
     with st.spinner("Calculating dashboard metrics..."):
@@ -101,7 +118,7 @@ def render_dashboard_tab(
         ].copy()
         
         if dashboard_data.empty:
-            st.error("âŒ No data available for selected location and scenarios.")
+            st.error("Ã¢ÂÅ’ No data available for selected location and scenarios.")
             st.stop()
         
         # Calculate pre-industrial baselines
@@ -148,9 +165,9 @@ def render_dashboard_tab(
     # Display metrics for each scenario
     for scenario in dashboard_scenarios:
         st.markdown("---")
-        st.subheader(f"🌐 {scenario}")
+        st.subheader(f"ðŸŒÂ {scenario}")
         
-        st.markdown("### 📅 Time Horizons")
+        st.markdown("### ðŸ“… Time Horizons")
         col_ref, col_short, col_mid, col_long = st.columns(4)
         
         with col_ref:

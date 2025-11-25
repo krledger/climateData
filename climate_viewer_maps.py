@@ -1,5 +1,6 @@
+# -*- coding: utf-8 -*-
 import os
-from climate_viewer_config import FOLIUM_AVAILABLE
+from climate_viewer_constants import FOLIUM_AVAILABLE
 
 if FOLIUM_AVAILABLE:
     import folium

@@ -9,9 +9,9 @@
       "description": "Continental Australia",
       "bbox": {
         "north": -10,
-        "west": 110,
-        "south": -45,
-        "east": 155
+        "west": 112,
+        "south": -44.5,
+        "east": 156.25
       },
       "note": "Recommended for Australian studies"
     },

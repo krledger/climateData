@@ -1,11 +1,12 @@
+# -*- coding: utf-8 -*-
 import pandas as pd
 import altair as alt
-from climate_viewer_config import IDX_COLS_ANNUAL, IDX_COLS_SEASONAL
+from climate_viewer_constants import IDX_COLS_ANNUAL, IDX_COLS_SEASONAL, WARMING_TARGET, AMPLIFICATION_FACTOR
 from climate_viewer_data_operations import apply_deltas_vs_base, apply_baseline_from_start, apply_smoothing
-from climate_viewer_constants import WARMING_TARGET, AMPLIFICATION_FACTOR
+
 
 def render_metrics_tab(st, ns, loc_sel, scen_sel, type_sel, name_sel, season_sel, y0, y1,
-                       mode, smooth, smooth_win, table_interval, show_15c_shading, show_horizon_shading,
+                       mode, smooth, smooth_win, show_15c_shading, show_horizon_shading,
                        short_start, mid_start, long_start, horizon_end,
                        df_all, base_df, preindustrial_baseline, BASE_LABEL):
     st.title("🌡️ Climate Metrics Viewer")
@@ -16,7 +17,7 @@ def render_metrics_tab(st, ns, loc_sel, scen_sel, type_sel, name_sel, season_sel
     with col2:
         st.metric("🌡️ Scenarios", len(scen_sel))
     with col3:
-        st.metric("🗓️ Year Range", f"{y0}-{y1}")
+        st.metric("📅 Year Range", f"{y0}-{y1}")
     with col4:
         st.metric("📈 Mode", mode.split("(")[0].strip())
 
@@ -84,7 +85,8 @@ def render_metrics_tab(st, ns, loc_sel, scen_sel, type_sel, name_sel, season_sel
             # Regional warming = Global warming Ã— Amplification factor
             # Regional temp at global target = Regional_baseline + (WARMING_TARGET Ã— AMPLIFICATION_FACTOR)
             REGIONAL_WARMING_AT_GLOBAL_TARGET = WARMING_TARGET * AMPLIFICATION_FACTOR  # = 1.724Â°C
-            warming_reference = {loc: temp + REGIONAL_WARMING_AT_GLOBAL_TARGET for loc, temp in preindustrial_baseline.items()}
+            warming_reference = {loc: temp + REGIONAL_WARMING_AT_GLOBAL_TARGET for loc, temp in
+                                 preindustrial_baseline.items()}
     with st.expander("📊 Summary Statistics", expanded=False):
         summary = view.groupby(["Scenario", "Name"])["Value"].agg([
             ("Mean", "mean"),
@@ -136,6 +138,19 @@ def render_metrics_tab(st, ns, loc_sel, scen_sel, type_sel, name_sel, season_sel
 
         selection = alt.selection_point(fields=["Metric", "Scenario"], bind="legend")
 
+        # Calculate y-axis domain including reference line if present
+        y_min = plot_data["Value"].min()
+        y_max = plot_data["Value"].max()
+
+        if warming_reference and location in warming_reference:
+            reference_temp = warming_reference[location]
+            y_min = min(y_min, reference_temp)
+            y_max = max(y_max, reference_temp)
+
+        y_range = y_max - y_min
+        y_padding = y_range * 0.05
+        y_domain = [y_min - y_padding, y_max + y_padding]
+
         chart_layers = []
 
         if show_horizon_shading and idx_cols == IDX_COLS_ANNUAL:
@@ -180,7 +195,7 @@ def render_metrics_tab(st, ns, loc_sel, scen_sel, type_sel, name_sel, season_sel
                 y=alt.Y(
                     "Value:Q",
                     title="Value",
-                    scale=alt.Scale(zero=False),
+                    scale=alt.Scale(domain=y_domain),
                     axis=alt.Axis(labelFontSize=12, titleFontSize=14)
                 ),
                 color=alt.Color(
@@ -218,12 +233,14 @@ def render_metrics_tab(st, ns, loc_sel, scen_sel, type_sel, name_sel, season_sel
 
         if warming_reference and location in warming_reference:
             reference_temp = warming_reference[location]
+            # Create simple DataFrame with same Value field as main chart for scale sharing
+            ref_data = pd.DataFrame({"Value": [reference_temp]})
             reference_line = (
-                alt.Chart(pd.DataFrame({"temp": [reference_temp]}))
+                alt.Chart(ref_data)
                 .mark_rule(color="red", strokeDash=[5, 5], strokeWidth=2)
                 .encode(
-                    y=alt.Y("temp:Q"),
-                    tooltip=alt.value(f"🎯 1.5°C global warming target")
+                    y="Value:Q",
+                    tooltip=alt.value("🎯 1.5°C global warming target")
                 )
             )
             chart_layers.append(reference_line)
@@ -231,14 +248,9 @@ def render_metrics_tab(st, ns, loc_sel, scen_sel, type_sel, name_sel, season_sel
         combined_chart = alt.layer(*chart_layers).properties(height=450).interactive()
         st.altair_chart(combined_chart, use_container_width=True)
 
-    st.subheader("📋 Data Table")
+    st.subheader("📄 Data Table")
 
     table_view = view.copy()
-    if table_interval > 1:
-        anchor = int(table_view["Year"].min())
-        table_view = table_view[
-            ((table_view["Year"].astype(int) - anchor) % table_interval) == 0
-            ]
 
     if len(scen_sel) > 1:
         table = table_view.pivot_table(
@@ -259,7 +271,7 @@ def render_metrics_tab(st, ns, loc_sel, scen_sel, type_sel, name_sel, season_sel
 
     csv = table.to_csv()
     st.download_button(
-        label="📄 Download as CSV",
+        label="ðŸ“¥ Download as CSV",
         data=csv,
         file_name=f"climate_metrics_{type_sel}_{y0}-{y1}.csv",
         mime="text/csv",

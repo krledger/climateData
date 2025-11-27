@@ -3,10 +3,21 @@
 """
 Climate Metrics Viewer
 ======================
-Last Updated: 2025-11-25 19:35 AEST
+Last Updated: 2025-11-26 21:25 AEST
+Previous Update: 2025-11-26 15:50 AEST
 
 Streamlined multi-tab application for browsing climate metrics.
 NO CACHING - Fresh data loading each time to avoid stale data bugs.
+
+Bias correction and scenario alignment are pre-computed in the metrics files
+(Value_BC column).  The viewer just selects which column to display based
+on the BC toggle.
+
+Time Horizons: Slider minimum is 2015 (SSP scenarios start 2015).
+Slider cascading: changing end of one slider updates start of next slider.
+
+Global tab passes smoothing parameters (smooth, smooth_win) to ensure
+consistency with Metrics tab display.
 
 Consolidated structure with minimal modules.
 """
@@ -23,7 +34,8 @@ try:
 except ImportError:
     sys.exit("Missing dependencies.  Run: pip install streamlit pandas pyarrow altair")
 
-from climate_viewer_constants import MODE, TIME_HORIZONS, METRIC_PRIORITIES, SEASONS, BASELINE_PERIOD, REFERENCE_YEAR, EMOJI
+from climate_viewer_constants import MODE, TIME_HORIZONS, METRIC_PRIORITIES, SEASONS, BASELINE_PERIOD, REFERENCE_YEAR, \
+    EMOJI
 from climate_viewer_data_operations import (
     resolve_folder,
     discover_scenarios,
@@ -34,7 +46,6 @@ from climate_viewer_data_operations import (
     parse_data_type,
     dedupe_preserve_order,
     slugify,
-    apply_bias_correction_to_dataframe,
 )
 from climate_viewer_tab_metrics import render_metrics_tab
 from climate_viewer_tab_dashboard import render_dashboard_tab
@@ -171,7 +182,8 @@ def run_metrics_viewer():
 
     # Create tabs
     tab1, tab2, tab3, tab4 = st.tabs(
-        [f"{EMOJI['thermometer']} Climate Metrics", f"{EMOJI['chart']} Dashboard", f"{EMOJI['globe']} Global 1.5\u00b0C Impact", f"{EMOJI['book']} User Guide"])
+        [f"{EMOJI['thermometer']} Climate Metrics", f"{EMOJI['chart']} Dashboard",
+         f"{EMOJI['globe']} Global Milestones", f"{EMOJI['book']} User Guide"])
 
     # ========================================================================
     # TAB 1: METRICS VIEWER
@@ -237,10 +249,10 @@ def run_metrics_viewer():
                 smooth_win = 1
 
             show_15c_shading = st.toggle(
-                "Show 1.5\u00b0C Target",
+                "Show 1.5C Target",
                 value=False,
                 key=f"{ns}_show_15c",
-                help="Show red line at 1.5\u00b0C global warming target (temperature metrics only)"
+                help="Show red line at 1.5 deg C global warming target (temperature metrics only)"
             )
 
             show_horizon_shading = st.toggle(
@@ -288,49 +300,98 @@ def run_metrics_viewer():
                 st.error(f"{EMOJI['warning']} Start year must be before end year")
                 y0, y1 = y1, y0
 
+            # Time Horizons with minimum of 2015 (SSP scenarios start 2015)
+            HORIZON_MIN_YEAR = 2015
+            horizon_min = max(y0, HORIZON_MIN_YEAR)
+
             st.markdown("**Time horizons:**")
+
+            # Initialise slider session state if not present
+            if f"{ns}_short_mid" not in st.session_state:
+                st.session_state[f"{ns}_short_mid"] = (
+                    max(TIME_HORIZONS['short_start_default'], horizon_min),
+                    max(TIME_HORIZONS['mid_start_default'], horizon_min + 1)
+                )
+            if f"{ns}_mid_long" not in st.session_state:
+                st.session_state[f"{ns}_mid_long"] = (
+                    max(TIME_HORIZONS['mid_start_default'], horizon_min + 1),
+                    max(TIME_HORIZONS['long_start_default'], horizon_min + 2)
+                )
+            if f"{ns}_long_end" not in st.session_state:
+                st.session_state[f"{ns}_long_end"] = (
+                    max(TIME_HORIZONS['long_start_default'], horizon_min + 2),
+                    min(TIME_HORIZONS['horizon_end_default'], y1)
+                )
+
+            # Read current values from session state
+            short_mid_val = st.session_state[f"{ns}_short_mid"]
+            mid_long_val = st.session_state[f"{ns}_mid_long"]
+            long_end_val = st.session_state[f"{ns}_long_end"]
+
+            # CASCADE: If short_mid END changed, update mid_long START
+            if short_mid_val[1] != mid_long_val[0]:
+                new_mid_start = short_mid_val[1]
+                new_mid_end = max(mid_long_val[1], new_mid_start + 1)
+                st.session_state[f"{ns}_mid_long"] = (new_mid_start, new_mid_end)
+                mid_long_val = st.session_state[f"{ns}_mid_long"]
+
+            # CASCADE: If mid_long END changed, update long_end START
+            if mid_long_val[1] != long_end_val[0]:
+                new_long_start = mid_long_val[1]
+                new_long_end = max(long_end_val[1], new_long_start + 1)
+                st.session_state[f"{ns}_long_end"] = (new_long_start, new_long_end)
+                long_end_val = st.session_state[f"{ns}_long_end"]
+
+            # Clamp all values to valid range
+            def clamp_slider(val, min_v, max_v):
+                start = max(min_v, min(val[0], max_v - 1))
+                end = max(start + 1, min(val[1], max_v))
+                return (start, end)
+
+            st.session_state[f"{ns}_short_mid"] = clamp_slider(st.session_state[f"{ns}_short_mid"], horizon_min, y1)
+            st.session_state[f"{ns}_mid_long"] = clamp_slider(st.session_state[f"{ns}_mid_long"], horizon_min, y1)
+            st.session_state[f"{ns}_long_end"] = clamp_slider(st.session_state[f"{ns}_long_end"], horizon_min, y1)
+
+            # Render sliders
             st.markdown('<p style="color: #3498DB; font-weight: bold; margin-bottom: 0;">Short-term</p>',
                         unsafe_allow_html=True)
             short_mid = st.slider(
                 "short_slider_label",
-                min_value=y0,
+                min_value=horizon_min,
                 max_value=y1,
-                value=(min(max(TIME_HORIZONS['short_start_default'], y0), y1),
-                       min(max(TIME_HORIZONS['mid_start_default'], y0), y1)),
                 step=1,
                 key=f"{ns}_short_mid",
                 label_visibility="collapsed"
             )
-            short_start = short_mid[0]
-            mid_start = short_mid[1]
 
             st.markdown('<p style="color: #F39C12; font-weight: bold; margin-bottom: 0;">Medium-term</p>',
                         unsafe_allow_html=True)
             mid_long = st.slider(
                 "mid_slider_label",
-                min_value=y0,
+                min_value=horizon_min,
                 max_value=y1,
-                value=(mid_start, min(max(TIME_HORIZONS['long_start_default'], y0), y1)),
                 step=1,
                 key=f"{ns}_mid_long",
                 label_visibility="collapsed"
             )
-            mid_start = mid_long[0]
-            long_start = mid_long[1]
 
             st.markdown('<p style="color: #E74C3C; font-weight: bold; margin-bottom: 0;">Long-term</p>',
                         unsafe_allow_html=True)
             long_end = st.slider(
                 "long_slider_label",
-                min_value=y0,
+                min_value=horizon_min,
                 max_value=y1,
-                value=(long_start, min(TIME_HORIZONS['horizon_end_default'], y1)),
                 step=1,
                 key=f"{ns}_long_end",
                 label_visibility="collapsed"
             )
+
+            # Extract final values
+            short_start = short_mid[0]
+            mid_start = mid_long[0]
             long_start = long_end[0]
             horizon_end = long_end[1]
+
             st.caption(f"Planning horizon: {horizon_end}")
 
         with st.sidebar.expander(f"{EMOJI['chart']} Metric Type", expanded=False):
@@ -354,12 +415,13 @@ def run_metrics_viewer():
                 "Bias Correction",
                 value=False,
                 key=f"{ns}_bc_enabled",
-                help="Apply bias correction to model data based on AGCD observations (1971-2014).  "
-                     "Corrections adjust for systematic model biases in temperature and rainfall."
+                help="Display bias-corrected values (pre-computed in metrics files).  "
+                     "Corrections adjust for systematic model biases based on AGCD observations (1971-2014).  "
+                     "SSP scenarios are aligned to AGCD at the 2014-2015 transition."
             )
 
             if bc_enabled:
-                st.caption("Bias correction enabled - model data adjusted to match AGCD observations")
+                st.caption("Displaying bias-corrected values (Value_BC column)")
 
         with st.sidebar.expander(f"{EMOJI['graph']} Metric Names", expanded=False):
             filtered_meta = metadata[
@@ -409,25 +471,16 @@ def run_metrics_viewer():
 
             for label in scen_sel:
                 path = label_to_path[label]
-                df = load_metrics_file(path)  # Load raw data only
-                df["Scenario"] = label  # Assign scenario name
+                df = load_metrics_file(path, use_bc=bc_enabled)
+                df["Scenario"] = label
                 dfs.append(df)
 
             df_all = pd.concat(dfs, ignore_index=True)
 
-            # Apply bias correction AFTER scenarios are properly assigned
-            if bc_enabled:
-                st.info(f"{EMOJI['wrench']} Applying bias correction to {len(df_all)} rows...")
-                df_all = apply_bias_correction_to_dataframe(df_all)
-
             # Load base scenario for delta calculations
             base_path = label_to_path[BASE_LABEL]
-            base_df = load_metrics_file(base_path)
+            base_df = load_metrics_file(base_path, use_bc=bc_enabled)
             base_df["Scenario"] = BASE_LABEL
-
-            # Apply BC to base scenario too if enabled
-            if bc_enabled:
-                base_df = apply_bias_correction_to_dataframe(base_df)
 
             preindustrial_baseline = calculate_preindustrial_baselines_by_location(
                 df_all, BASELINE_PERIOD, loc_sel
@@ -435,13 +488,10 @@ def run_metrics_viewer():
 
         # Create wrapper function for tabs that need to load additional data
         def load_metrics_func_with_bc(path):
-            df = load_metrics_file(path)
+            df = load_metrics_file(path, use_bc=bc_enabled)
             # Infer scenario from path
             scenario_name = os.path.basename(os.path.dirname(path))
             df["Scenario"] = scenario_name
-            # Apply BC if enabled
-            if bc_enabled:
-                df = apply_bias_correction_to_dataframe(df)
             return df
 
         render_metrics_tab(
@@ -460,13 +510,15 @@ def run_metrics_viewer():
             load_metrics_func_with_bc, y0, mid_start, long_start, horizon_end
         )
 
-    # ========================================================================
-    # TAB 3: GLOBAL 1.5\u00b0C IMPACT
-    # ========================================================================
-    with tab3:
-        render_global_tab(
-            st, scen_sel, loc_sel, df_all, labels, label_to_path, load_metrics_func_with_bc
-        )
+        # ========================================================================
+        # TAB 3: GLOBAL WARMING THRESHOLDS
+        # ========================================================================
+        with tab3:
+            render_global_tab(
+                st, scen_sel, loc_sel, df_all, labels, label_to_path, load_metrics_func_with_bc,
+                y0, y1, short_start, mid_start, long_start, horizon_end,
+                smooth=smooth, smooth_win=smooth_win
+            )
 
     # ========================================================================
     # TAB 4: USER GUIDE

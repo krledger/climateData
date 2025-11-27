@@ -1,8 +1,15 @@
 # -*- coding: utf-8 -*-
 """
-Climate Viewer Dashboard Tab - Compact Version
+Climate Viewer Dashboard Tab - Optimised Version
+=================================================
+Last Updated: 2025-11-26 15:15 AEST
+
 Displays climate metrics across time horizons with pre-industrial baseline comparison.
 Enhanced with bias-corrected rain metrics and PDF export.
+
+Performance Note:
+- Uses df_all from main app directly (avoids duplicate loading)
+- Loads Historical ONCE before location loop if needed (not per-location)
 """
 
 import os
@@ -170,6 +177,10 @@ def render_dashboard_tab(
 ):
     """
     Render the climate dashboard tab with compact layout and PDF export.
+
+    Optimised to avoid duplicate data loading:
+    - Uses df_all directly from main app
+    - Loads Historical only ONCE if not already in df_all
     """
     st.title(f"{EMOJI['chart']} Climate Change Dashboard")
 
@@ -178,7 +189,8 @@ def render_dashboard_tab(
     dashboard_scenarios = [s for s in scen_sel if "historical" not in s.lower() and "agcd" not in s.lower()]
 
     if not dashboard_scenarios:
-        st.warning(f"{EMOJI['warning']} Please select at least one future scenario (excluding historical) to view dashboard.")
+        st.warning(
+            f"{EMOJI['warning']} Please select at least one future scenario (excluding historical) to view dashboard.")
         st.stop()
 
     # Show region map if available
@@ -205,7 +217,35 @@ def render_dashboard_tab(
 
     # Collect data for PDF export
     pdf_data = {}
-    preindustrial_baselines = {}
+
+    # =========================================================================
+    # OPTIMISATION: Load Historical data ONCE before location loop if needed
+    # =========================================================================
+    hist_label = None
+    for lbl in labels:
+        if "historical" in lbl.lower():
+            hist_label = lbl
+            break
+
+    # Check if Historical is already in df_all
+    scenarios_in_df = set(df_all["Scenario"].unique()) if "Scenario" in df_all.columns else set()
+    hist_df = None
+
+    if hist_label:
+        if hist_label in scenarios_in_df:
+            # Historical already loaded - extract from df_all
+            hist_df = df_all[df_all["Scenario"] == hist_label].copy()
+        elif hist_label in label_to_path:
+            # Historical not in df_all - load it ONCE here
+            hist_df = load_metrics_func(label_to_path[hist_label])
+
+    # Pre-calculate preindustrial baselines for ALL locations at once (efficient)
+    preindustrial_baselines_by_loc = {}
+    if hist_df is not None and not hist_df.empty:
+        for location in loc_sel:
+            preindustrial_baselines_by_loc[location] = calculate_preindustrial_baselines_by_metric(
+                hist_df, BASELINE_PERIOD, location
+            )
 
     # Loop through all selected locations
     for location_idx, dashboard_location in enumerate(loc_sel):
@@ -226,36 +266,18 @@ def render_dashboard_tab(
                 st.warning(f"{EMOJI['warning']} No data available for {dashboard_location} and selected scenarios.")
                 continue
 
-            # Include Historical data for baseline if needed
-            if baseline_year < REFERENCE_YEAR:
-                hist_scenario = None
-                for lbl in labels:
-                    if "historical" in lbl.lower():
-                        hist_scenario = lbl
-                        break
-
-                if hist_scenario and hist_scenario not in dashboard_scenarios:
-                    hist_path = label_to_path[hist_scenario]
-                    hist_df = load_metrics_func(hist_path)
+            # Include Historical data for baseline if needed (using cached hist_df)
+            if baseline_year < REFERENCE_YEAR and hist_label:
+                if hist_label not in dashboard_scenarios and hist_df is not None:
                     hist_subset = hist_df[
                         (hist_df["Location"] == dashboard_location) &
                         (hist_df["Season"] == "Annual")
                         ].copy()
-                    dashboard_data = pd.concat([dashboard_data, hist_subset], ignore_index=True)
+                    if not hist_subset.empty:
+                        dashboard_data = pd.concat([dashboard_data, hist_subset], ignore_index=True)
 
-            # Calculate pre-industrial baselines
-            historical_scenario = None
-            for label in labels:
-                if "historical" in label.lower():
-                    historical_scenario = label
-                    break
-
-            if historical_scenario:
-                historical_path = label_to_path[historical_scenario]
-                historical_df = load_metrics_func(historical_path)
-                preindustrial_baselines = calculate_preindustrial_baselines_by_metric(
-                    historical_df, BASELINE_PERIOD, dashboard_location
-                )
+            # Get pre-industrial baselines for this location (already calculated)
+            preindustrial_baselines = preindustrial_baselines_by_loc.get(dashboard_location, {})
 
         # Display metrics for each scenario
         for scenario in dashboard_scenarios:
@@ -271,10 +293,8 @@ def render_dashboard_tab(
             scenario_baseline_year = baseline_year
             baseline_scenario = scenario
             if baseline_year < REFERENCE_YEAR:
-                for lbl in labels:
-                    if "historical" in lbl.lower():
-                        baseline_scenario = lbl
-                        break
+                if hist_label:
+                    baseline_scenario = hist_label
 
             # Time horizon header - original sizes
             st.markdown(f"### {EMOJI['calendar']} Time Horizons")
@@ -336,9 +356,9 @@ def render_dashboard_tab(
                         scenario, mid_start, dashboard_location
                     )
                     change_short = (value_short - baseline_val) if (
-                                value_short is not None and baseline_val is not None) else None
+                            value_short is not None and baseline_val is not None) else None
                     pi_change_short = (
-                                value_short - preindustrial_baselines.get((metric_type, actual_metric_name))) if (
+                            value_short - preindustrial_baselines.get((metric_type, actual_metric_name))) if (
                             value_short is not None and preindustrial_baselines.get(
                         (metric_type, actual_metric_name)) is not None
                     ) else None
@@ -348,7 +368,7 @@ def render_dashboard_tab(
                         scenario, long_start, dashboard_location
                     )
                     change_mid = (value_mid - baseline_val) if (
-                                value_mid is not None and baseline_val is not None) else None
+                            value_mid is not None and baseline_val is not None) else None
                     pi_change_mid = (value_mid - preindustrial_baselines.get((metric_type, actual_metric_name))) if (
                             value_mid is not None and preindustrial_baselines.get(
                         (metric_type, actual_metric_name)) is not None
@@ -359,7 +379,7 @@ def render_dashboard_tab(
                         scenario, horizon_end, dashboard_location
                     )
                     change_long = (value_long - baseline_val) if (
-                                value_long is not None and baseline_val is not None) else None
+                            value_long is not None and baseline_val is not None) else None
                     pi_change_long = (value_long - preindustrial_baselines.get((metric_type, actual_metric_name))) if (
                             value_long is not None and preindustrial_baselines.get(
                         (metric_type, actual_metric_name)) is not None
@@ -408,6 +428,9 @@ def render_dashboard_tab(
 
     # PDF Export - single click download at bottom of dashboard
     if pdf_data:  # Only show if we have data
+        # Use first location's baselines for PDF (simplified)
+        first_loc_baselines = preindustrial_baselines_by_loc.get(loc_sel[0], {}) if loc_sel else {}
+
         pdf_bytes = generate_pdf_report(
             pdf_data,
             loc_sel,
@@ -415,7 +438,7 @@ def render_dashboard_tab(
             mid_start,
             long_start,
             horizon_end,
-            preindustrial_baselines
+            first_loc_baselines
         )
 
         if pdf_bytes:

@@ -1,25 +1,31 @@
 # -*- coding: utf-8 -*-
+"""
+Climate Viewer Metrics Tab
+===========================
+Last Updated: 2025-11-26 17:15 AEST - Fixed smoothing edge effects (apply before year filter)
+"""
 import pandas as pd
 import altair as alt
-from climate_viewer_constants import IDX_COLS_ANNUAL, IDX_COLS_SEASONAL, WARMING_TARGET, AMPLIFICATION_FACTOR
-from climate_viewer_data_operations import apply_deltas_vs_base, apply_baseline_from_start, apply_smoothing
+from climate_viewer_constants import IDX_COLS_ANNUAL, IDX_COLS_SEASONAL, WARMING_TARGET, AMPLIFICATION_FACTOR, EMOJI
+from climate_viewer_data_operations import apply_deltas_vs_base, apply_baseline_from_start, apply_smoothing, \
+    align_smoothed_to_agcd
 
 
 def render_metrics_tab(st, ns, loc_sel, scen_sel, type_sel, name_sel, season_sel, y0, y1,
                        mode, smooth, smooth_win, show_15c_shading, show_horizon_shading,
                        short_start, mid_start, long_start, horizon_end,
                        df_all, base_df, preindustrial_baseline, BASE_LABEL):
-    st.title("🌡️ Climate Metrics Viewer")
+    st.title(f"{EMOJI['thermometer']} Climate Metrics Viewer")
 
     col1, col2, col3, col4 = st.columns(4)
     with col1:
-        st.metric("🗺️ Locations", len(loc_sel))
+        st.metric(f"{EMOJI['map']} Locations", len(loc_sel))
     with col2:
-        st.metric("🌡️ Scenarios", len(scen_sel))
+        st.metric(f"{EMOJI['thermometer']} Scenarios", len(scen_sel))
     with col3:
-        st.metric("📅 Year Range", f"{y0}-{y1}")
+        st.metric(f"{EMOJI['calendar']} Year Range", f"{y0}-{y1}")
     with col4:
-        st.metric("📈 Mode", mode.split("(")[0].strip())
+        st.metric(f"{EMOJI['graph']} Mode", mode.split("(")[0].strip())
 
     st.caption(
         f"Locations: {', '.join(loc_sel)} - "
@@ -28,39 +34,50 @@ def render_metrics_tab(st, ns, loc_sel, scen_sel, type_sel, name_sel, season_sel
         f"Metrics: {', '.join(name_sel)}"
     )
 
-    mask = (
-            df_all["Year"].between(y0, y1) &
+    # Filter by everything EXCEPT year range first (for smoothing to work correctly)
+    content_mask = (
             df_all["Location"].isin(loc_sel) &
             df_all["Season"].isin(season_sel) &
             (df_all["Type"] == type_sel) &
             df_all["Name"].isin(name_sel)
     )
-    view = df_all[mask].copy()
+    view = df_all[content_mask].copy()
 
     use_baseline = mode.startswith("Baseline")
     apply_delta = mode.startswith("Deltas")
 
     if apply_delta:
-        base_mask = (
-                base_df["Year"].between(y0, y1) &
+        base_content_mask = (
                 base_df["Location"].isin(loc_sel) &
                 base_df["Season"].isin(season_sel) &
                 (base_df["Type"] == type_sel) &
                 base_df["Name"].isin(name_sel)
         )
-        base_filtered = base_df[base_mask].copy()
+        base_filtered = base_df[base_content_mask].copy()
 
         view = apply_deltas_vs_base(view, base_filtered)
 
         if smooth:
             view = apply_smoothing(view, smooth_win)
+
+        # NOW apply year filter
+        view = view[view["Year"].between(y0, y1)]
+
     elif use_baseline:
         if smooth:
             view = apply_smoothing(view, smooth_win)
-        view = apply_baseline_from_start(view)
+
+        # NOW apply year filter (before baseline calculation)
+        view = view[view["Year"].between(y0, y1)]
+        view = apply_baseline_from_start(view, baseline_year=y0)
     else:
         if smooth:
             view = apply_smoothing(view, smooth_win)
+            # Re-align scenarios to AGCD after smoothing (smoothing shifts alignment)
+            view = align_smoothed_to_agcd(view, alignment_year=2014)
+
+        # NOW apply year filter
+        view = view[view["Year"].between(y0, y1)]
 
     view = view.dropna(subset=["Value"])
 
@@ -80,14 +97,37 @@ def render_metrics_tab(st, ns, loc_sel, scen_sel, type_sel, name_sel, season_sel
 
     warming_reference = None
     if type_sel == "Temp" and "Average" in name_sel and show_15c_shading:
-        if preindustrial_baseline and not use_baseline and not apply_delta:
+        if preindustrial_baseline:
             # When GLOBAL warming reaches target, regional warming is amplified
-            # Regional warming = Global warming Ã— Amplification factor
-            # Regional temp at global target = Regional_baseline + (WARMING_TARGET Ã— AMPLIFICATION_FACTOR)
-            REGIONAL_WARMING_AT_GLOBAL_TARGET = WARMING_TARGET * AMPLIFICATION_FACTOR  # = 1.724Â°C
-            warming_reference = {loc: temp + REGIONAL_WARMING_AT_GLOBAL_TARGET for loc, temp in
-                                 preindustrial_baseline.items()}
-    with st.expander("📊 Summary Statistics", expanded=False):
+            # Regional warming = Global warming x Amplification factor
+            # Regional temp at global target = Regional_baseline + (WARMING_TARGET x AMPLIFICATION_FACTOR)
+            REGIONAL_WARMING_AT_GLOBAL_TARGET = WARMING_TARGET * AMPLIFICATION_FACTOR  # = 1.724 deg C
+
+            if use_baseline or apply_delta:
+                # In baseline/delta mode, calculate the reference relative to the display baseline
+                # Need to find what the baseline-adjusted value would be at the warming threshold
+                warming_reference = {}
+                for loc, preindustrial_temp in preindustrial_baseline.items():
+                    # Target absolute temperature
+                    target_absolute_temp = preindustrial_temp + REGIONAL_WARMING_AT_GLOBAL_TARGET
+
+                    # Get the baseline value at start year for this location
+                    loc_data = df_all[
+                        (df_all["Location"] == loc) &
+                        (df_all["Type"] == "Temp") &
+                        (df_all["Name"] == "Average") &
+                        (df_all["Season"] == "Annual") &
+                        (df_all["Year"] == y0)
+                        ]
+                    if not loc_data.empty:
+                        baseline_temp = loc_data["Value"].mean()
+                        # Reference line in baseline mode = target - baseline
+                        warming_reference[loc] = target_absolute_temp - baseline_temp
+            else:
+                # Absolute mode - use absolute temperature values
+                warming_reference = {loc: temp + REGIONAL_WARMING_AT_GLOBAL_TARGET for loc, temp in
+                                     preindustrial_baseline.items()}
+    with st.expander(f"{EMOJI['chart']} Summary Statistics", expanded=False):
         summary = view.groupby(["Scenario", "Name"])["Value"].agg([
             ("Mean", "mean"),
             ("Min", "min"),
@@ -96,10 +136,10 @@ def render_metrics_tab(st, ns, loc_sel, scen_sel, type_sel, name_sel, season_sel
         ]).round(2)
         st.dataframe(summary, width="stretch")
 
-    st.subheader("📈 Visualisation")
+    st.subheader(f"{EMOJI['graph']} Visualisation")
 
     for location in loc_sel:
-        st.markdown(f"📍 {location}")
+        st.markdown(f"{EMOJI['pin']} {location}")
 
         location_data = view[view["Location"] == location].copy()
 
@@ -240,7 +280,7 @@ def render_metrics_tab(st, ns, loc_sel, scen_sel, type_sel, name_sel, season_sel
                 .mark_rule(color="red", strokeDash=[5, 5], strokeWidth=2)
                 .encode(
                     y="Value:Q",
-                    tooltip=alt.value("🎯 1.5°C global warming target")
+                    tooltip=alt.value("1.5 deg C global warming target")
                 )
             )
             chart_layers.append(reference_line)
@@ -248,7 +288,7 @@ def render_metrics_tab(st, ns, loc_sel, scen_sel, type_sel, name_sel, season_sel
         combined_chart = alt.layer(*chart_layers).properties(height=450).interactive()
         st.altair_chart(combined_chart, use_container_width=True)
 
-    st.subheader("📄 Data Table")
+    st.subheader(f"{EMOJI['page']} Data Table")
 
     table_view = view.copy()
 
@@ -271,7 +311,7 @@ def render_metrics_tab(st, ns, loc_sel, scen_sel, type_sel, name_sel, season_sel
 
     csv = table.to_csv()
     st.download_button(
-        label="ðŸ“¥ Download as CSV",
+        label=f"{EMOJI['page']} Download as CSV",
         data=csv,
         file_name=f"climate_metrics_{type_sel}_{y0}-{y1}.csv",
         mime="text/csv",

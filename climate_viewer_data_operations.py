@@ -3,19 +3,28 @@
 """
 Climate Viewer Data Operations
 ================================
+Last Updated: 2025-11-26 14:20 AEST - Added align_smoothed_to_agcd function
+Previous Update: 2025-11-26 13:30 AEST
 
 Consolidated module containing all data loading, transformation, calculation
 and analysis functions.
 
 NO CACHING - All operations run fresh each time to avoid stale data bugs.
 
+Note: Bias correction and scenario alignment are now pre-computed in the
+metrics generator (Value_BC column).  The viewer simply selects which column
+to use based on the BC toggle.
+
+Post-smoothing alignment: When smoothing is applied, the pre-computed alignment
+shifts due to averaging.  The align_smoothed_to_agcd() function re-aligns
+scenarios to AGCD at the 2014 transition point after smoothing.
+
 Sections:
   1. Basic Helpers
   2. Data Loading & Schema
   3. Data Transformations
   4. Utility Functions
-  5. Bias Correction
-  6. Analysis Functions
+  5. Analysis Functions
 """
 
 import os
@@ -129,12 +138,13 @@ def discover_scenarios(base_folder: str) -> list[Tuple[str, str, str]]:
     return scenarios
 
 
-def load_metrics_file(path: str) -> pd.DataFrame:
+def load_metrics_file(path: str, use_bc: bool = False) -> pd.DataFrame:
     """
     Load a single metrics parquet file with data quality validation.
 
     Args:
         path: Path to parquet file
+        use_bc: If True and Value_BC column exists, use it as the Value column
 
     Returns:
         DataFrame with loaded data
@@ -148,6 +158,10 @@ def load_metrics_file(path: str) -> pd.DataFrame:
         # Handle column naming: Metric -> Name
         if 'Metric' in df.columns and 'Name' not in df.columns:
             df = df.rename(columns={'Metric': 'Name'})
+
+        # If use_bc and Value_BC column exists, use it as Value
+        if use_bc and "Value_BC" in df.columns:
+            df["Value"] = df["Value_BC"]
 
         # Check if we need to parse Data Type or if columns already exist
         has_parsed_cols = all(col in df.columns for col in ['Type', 'Name', 'Location'])
@@ -207,37 +221,6 @@ def load_metrics_file(path: str) -> pd.DataFrame:
         raise
     except Exception as e:
         raise RuntimeError(f"Error loading {path}: {e}")
-
-
-def apply_bias_correction_to_dataframe(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Apply bias correction to all rows in a DataFrame.
-
-    Args:
-        df: DataFrame with climate metrics (must have Location, Season, Type, Name, Value, Scenario columns)
-
-    Returns:
-        DataFrame with bias-corrected values
-    """
-    from climate_viewer_constants import apply_bias_correction
-
-    # Apply correction to each row
-    df = df.copy()
-
-    # Vectorized approach for better performance
-    def apply_bc_row(row):
-        return apply_bias_correction(
-            value=row['Value'],
-            scenario=row['Scenario'],
-            location=row['Location'],
-            season=row['Season'],
-            metric_type=row['Type'],
-            metric_name=row['Name']
-        )
-
-    df['Value'] = df.apply(apply_bc_row, axis=1)
-
-    return df
 
 
 def load_minimal_metadata(pairs: Sequence[Tuple[str, str, float]]) -> pd.DataFrame:
@@ -340,20 +323,131 @@ def apply_deltas_vs_base(view: pd.DataFrame, base: pd.DataFrame) -> pd.DataFrame
     return merged.drop(columns=["BaseValue", "FirstBaseValue"])
 
 
-def apply_baseline_from_start(view: pd.DataFrame) -> pd.DataFrame:
-    """Calculate change from first year in each group."""
+def apply_baseline_from_start(view: pd.DataFrame, baseline_year: int = None) -> pd.DataFrame:
+    """
+    Calculate change from a common baseline year across ALL scenarios.
+
+    This ensures SSP scenarios continue SMOOTHLY from where Historical left off,
+    rather than jumping due to model initialisation discontinuities.
+
+    The alignment works by:
+    1. Baseline Historical to the start year (shows change from baseline)
+    2. For SSP scenarios, apply same baseline PLUS an alignment offset
+       so SSP first year matches Historical last year
+
+    Args:
+        view: DataFrame with climate data
+        baseline_year: Year to use as baseline.  If None, uses minimum year in data.
+
+    Returns:
+        DataFrame with values as changes from baseline, with SSP aligned to Historical
+    """
     if view.empty:
         return view
 
-    keys = ["Scenario"] + ["Location", "Type", "Name", "Season", "Data Type"]
-
     view = view.sort_values("Year").copy()
 
-    first_values = view.groupby(keys, as_index=False).first()
-    first_values = first_values[keys + ["Value"]].rename(columns={"Value": "Baseline"})
+    # Metric grouping keys (excludes Scenario - we want common baseline across scenarios)
+    metric_keys = ["Location", "Type", "Name", "Season", "Data Type"]
 
-    result = view.merge(first_values, on=keys, how="left")
+    # Determine baseline year
+    if baseline_year is None:
+        baseline_year = view["Year"].min()
+
+    # Identify Historical scenario (case-insensitive)
+    scenarios = view["Scenario"].unique()
+    historical_scenario = None
+    for s in scenarios:
+        if s.lower() == "historical":
+            historical_scenario = s
+            break
+
+    # Get baseline values from the baseline year
+    # Use data from any scenario that has data at baseline_year (typically Historical)
+    baseline_data = view[view["Year"] == baseline_year].copy()
+
+    if baseline_data.empty:
+        # Fallback: if no data at baseline_year, use minimum year in data
+        baseline_year = view["Year"].min()
+        baseline_data = view[view["Year"] == baseline_year].copy()
+
+    # For each metric group, get the baseline value (average if multiple scenarios have data)
+    baseline_values = baseline_data.groupby(metric_keys, as_index=False)["Value"].mean()
+    baseline_values = baseline_values.rename(columns={"Value": "Baseline"})
+
+    # Merge baseline onto all data (applies same baseline to all scenarios)
+    result = view.merge(baseline_values, on=metric_keys, how="left")
+
+    # For metrics where no baseline was found (e.g., metric only exists in SSP scenarios),
+    # fall back to each scenario's first value
+    missing_baseline = result["Baseline"].isna()
+    if missing_baseline.any():
+        # Get first values per scenario for metrics missing baseline
+        scenario_keys = ["Scenario"] + metric_keys
+        first_by_scenario = view.sort_values("Year").groupby(scenario_keys, as_index=False).first()
+        first_by_scenario = first_by_scenario[scenario_keys + ["Value"]].rename(columns={"Value": "FallbackBaseline"})
+
+        result = result.merge(first_by_scenario, on=scenario_keys, how="left")
+        result.loc[missing_baseline, "Baseline"] = result.loc[missing_baseline, "FallbackBaseline"]
+        result = result.drop(columns=["FallbackBaseline"])
+
+    # Apply baseline subtraction
     result["Value"] = result["Value"] - result["Baseline"]
+
+    # =========================================================================
+    # ALIGNMENT: Make SSP scenarios continue smoothly from Historical
+    # =========================================================================
+    if historical_scenario is not None:
+        # Find transition point: last year of Historical
+        historical_data = view[view["Scenario"] == historical_scenario]
+        if not historical_data.empty:
+            historical_last_year = historical_data["Year"].max()
+
+            # For each SSP scenario, calculate alignment offset
+            for scenario in scenarios:
+                if scenario == historical_scenario:
+                    continue
+
+                scenario_data = view[view["Scenario"] == scenario]
+                if scenario_data.empty:
+                    continue
+
+                scenario_first_year = scenario_data["Year"].min()
+
+                # Only align if SSP starts after Historical ends (typical case: 2015 vs 2014)
+                if scenario_first_year > historical_last_year:
+                    # For each metric, calculate alignment offset
+                    for _, metric_group in result[result["Scenario"] == scenario].groupby(metric_keys):
+                        # Get Historical's baseline-adjusted value at its last year
+                        hist_mask = (
+                                (result["Scenario"] == historical_scenario) &
+                                (result["Year"] == historical_last_year)
+                        )
+                        for key in metric_keys:
+                            hist_mask = hist_mask & (result[key] == metric_group[key].iloc[0])
+
+                        hist_at_transition = result.loc[hist_mask, "Value"]
+
+                        # Get SSP's baseline-adjusted value at its first year
+                        ssp_mask = (
+                                (result["Scenario"] == scenario) &
+                                (result["Year"] == scenario_first_year)
+                        )
+                        for key in metric_keys:
+                            ssp_mask = ssp_mask & (result[key] == metric_group[key].iloc[0])
+
+                        ssp_at_start = result.loc[ssp_mask, "Value"]
+
+                        if not hist_at_transition.empty and not ssp_at_start.empty:
+                            # Alignment offset = Historical value - SSP value at transition
+                            offset = hist_at_transition.iloc[0] - ssp_at_start.iloc[0]
+
+                            # Apply offset to all rows of this metric in this SSP scenario
+                            ssp_metric_mask = (result["Scenario"] == scenario)
+                            for key in metric_keys:
+                                ssp_metric_mask = ssp_metric_mask & (result[key] == metric_group[key].iloc[0])
+
+                            result.loc[ssp_metric_mask, "Value"] = result.loc[ssp_metric_mask, "Value"] + offset
 
     return result.drop(columns=["Baseline"])
 
@@ -378,6 +472,89 @@ def apply_smoothing(df: pd.DataFrame, window: int) -> pd.DataFrame:
 
     result = pd.concat(smoothed_groups, ignore_index=True)
     return result.dropna(subset=["Value"])
+
+
+def align_smoothed_to_agcd(df: pd.DataFrame, alignment_year: int = 2014) -> pd.DataFrame:
+    """
+    Re-align scenarios to AGCD after smoothing has been applied.
+
+    Smoothing shifts values due to averaging, so scenarios that were aligned
+    at the raw data level may no longer meet at the transition point.
+
+    This function re-aligns all scenarios to match AGCD at the alignment year.
+
+    Args:
+        df: DataFrame with smoothed data (must contain AGCD scenario)
+        alignment_year: Year to align to (default 2014, last year of AGCD/Historical overlap)
+
+    Returns:
+        DataFrame with re-aligned values
+    """
+    if df.empty:
+        return df
+
+    # Check if AGCD is present
+    scenarios = df["Scenario"].unique()
+    if "AGCD" not in scenarios:
+        # No AGCD to align to - return unchanged
+        return df
+
+    df = df.copy()
+    metric_keys = ["Location", "Type", "Name", "Season"]
+
+    # Get AGCD data at alignment year
+    agcd_data = df[(df["Scenario"] == "AGCD") & (df["Year"] == alignment_year)]
+
+    if agcd_data.empty:
+        # AGCD doesn't have alignment year data - return unchanged
+        return df
+
+    # Build lookup of AGCD values at alignment year
+    agcd_lookup = {}
+    for _, row in agcd_data.iterrows():
+        key = tuple(row[k] for k in metric_keys)
+        agcd_lookup[key] = row["Value"]
+
+    # Process each non-AGCD scenario
+    for scenario in scenarios:
+        if scenario == "AGCD":
+            continue
+
+        # Determine which year to use for this scenario
+        is_ssp = scenario.upper().startswith("SSP")
+        if is_ssp:
+            # SSP scenarios: use 2015 (first year) to align to AGCD 2014
+            scen_align_year = 2015
+        else:
+            # Historical and others: use same year as AGCD
+            scen_align_year = alignment_year
+
+        # Get scenario data at its alignment year
+        scen_at_year = df[(df["Scenario"] == scenario) & (df["Year"] == scen_align_year)]
+
+        if scen_at_year.empty:
+            continue
+
+        # Calculate and apply offsets for each metric
+        for _, row in scen_at_year.iterrows():
+            key = tuple(row[k] for k in metric_keys)
+
+            if key not in agcd_lookup:
+                continue
+
+            agcd_value = agcd_lookup[key]
+            scen_value = row["Value"]
+            offset = agcd_value - scen_value
+
+            if abs(offset) > 0.001:
+                # Apply offset to all rows of this scenario/metric combination
+                mask = (df["Scenario"] == scenario)
+                for i, k in enumerate(metric_keys):
+                    mask = mask & (df[k] == key[i])
+
+                df.loc[mask, "Value"] = df.loc[mask, "Value"] + offset
+
+    return df
 
 
 # ============================================================================

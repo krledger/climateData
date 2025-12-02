@@ -1,0 +1,78 @@
+{
+  "created": "2025-11-27T23:59:23Z",
+  "source": "metrics_from_parquet_multi",
+  "input": {
+    "file": "raw_daily.parquet",
+    "temporal_resolution": "daily"
+  },
+  "parquet": {
+    "path": "/Users/ken/PycharmProjects/climateData/metricsDataFiles/AGCD/metrics.parquet",
+    "compression": "zstd"
+  },
+  "data_layout": {
+    "schema_version": "1.0",
+    "index": {
+      "name": "row",
+      "kind": "tabular"
+    },
+    "columns": [
+      {
+        "name": "Year",
+        "dtype": "int64",
+        "non_null": 21414,
+        "nulls": 0,
+        "min": 1900.0,
+        "max": 2024.0
+      },
+      {
+        "name": "Season",
+        "dtype": "object",
+        "non_null": 21414,
+        "nulls": 0,
+        "min": null,
+        "max": null
+      },
+      {
+        "name": "Data Type",
+        "dtype": "object",
+        "non_null": 21414,
+        "nulls": 0,
+        "min": null,
+        "max": null
+      },
+      {
+        "name": "Metric",
+        "dtype": "object",
+        "non_null": 21414,
+        "nulls": 0,
+        "min": null,
+        "max": null
+      },
+      {
+        "name": "Type",
+        "dtype": "object",
+        "non_null": 21414,
+        "nulls": 0,
+        "min": null,
+        "max": null
+      },
+      {
+        "name": "Location",
+        "dtype": "object",
+        "non_null": 21414,
+        "nulls": 0,
+        "min": null,
+        "max": null
+      },
+      {
+        "name": "Value",
+        "dtype": "float64",
+        "non_null": 21414,
+        "nulls": 0,
+        "min": 0.0,
+        "max": 1424.8232421875
+      }
+    ],
+    "rows": 21414
+  }
+}

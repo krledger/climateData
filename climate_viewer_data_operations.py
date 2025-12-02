@@ -3,13 +3,17 @@
 """
 Climate Viewer Data Operations
 ================================
-Last Updated: 2025-11-26 14:20 AEST - Added align_smoothed_to_agcd function
-Previous Update: 2025-11-26 13:30 AEST
+Last Updated: 2025-12-02 15:30 AEST - Optimised data loading
+Previous Update: 2025-11-26 14:20 AEST
 
 Consolidated module containing all data loading, transformation, calculation
 and analysis functions.
 
-NO CACHING - All operations run fresh each time to avoid stale data bugs.
+Optimisations (2025-12-02):
+  - PyArrow direct read with column selection
+  - Categorical dtypes for string columns (faster groupby, less memory)
+  - Streamlit caching with hash-based invalidation
+  - Optimised smoothing via groupby().transform()
 
 Note: Bias correction and scenario alignment are now pre-computed in the
 metrics generator (Value_BC column).  The viewer simply selects which column
@@ -31,13 +35,16 @@ import os
 import sys
 import re
 import json
+import hashlib
 import pandas as pd
 import numpy as np
+import pyarrow.parquet as pq
+import streamlit as st
 from pathlib import Path
-from typing import Dict, Optional, Tuple, Sequence
+from typing import Dict, List, Optional, Tuple, Sequence
 from io import BytesIO
 
-from climate_viewer_constants import REQUIRED_COLUMNS, BASELINE_PERIOD
+from climate_viewer_constants import REQUIRED_COLUMNS, BASELINE_PERIOD, get_preindustrial_baseline
 
 
 # ============================================================================
@@ -301,6 +308,163 @@ def load_minimal_metadata(pairs: Sequence[Tuple[str, str, float]]) -> pd.DataFra
 
 
 # ============================================================================
+# SECTION 2B: OPTIMISED DATA LOADING
+# ============================================================================
+
+# Columns needed for the viewer (skip unused columns for faster loading)
+VIEWER_COLUMNS = [
+    "Year", "Season", "Location", "Type", "Name",
+    "Data Type", "Value", "Value_BC"
+]
+
+# Columns to convert to categorical (reduces memory, faster groupby)
+CATEGORICAL_COLUMNS = ["Season", "Location", "Type", "Name", "Data Type", "Scenario"]
+
+
+def load_parquet_optimised(path: str, scenario_label: str) -> pd.DataFrame:
+    """
+    Load parquet file with optimisations.
+
+    - Uses PyArrow for faster reads
+    - Only loads required columns
+    - Converts strings to categoricals
+    """
+    # Read only needed columns via PyArrow
+    try:
+        # Get available columns
+        parquet_file = pq.ParquetFile(path)
+        available_cols = parquet_file.schema.names
+
+        # Select only columns we need that exist in the file
+        cols_to_read = [c for c in VIEWER_COLUMNS if c in available_cols]
+
+        # Handle column name variants
+        if 'Metric' in available_cols and 'Name' not in available_cols:
+            cols_to_read = [c if c != 'Name' else 'Metric' for c in cols_to_read]
+
+        # Read with PyArrow (faster than pandas default)
+        table = pq.read_table(path, columns=cols_to_read)
+        df = table.to_pandas()
+
+    except Exception:
+        # Fallback to pandas
+        df = pd.read_parquet(path, engine="pyarrow")
+
+    # Rename Metric -> Name if needed
+    if 'Metric' in df.columns and 'Name' not in df.columns:
+        df = df.rename(columns={'Metric': 'Name'})
+
+    # Add scenario column
+    df["Scenario"] = scenario_label
+
+    # Convert to categoricals (big memory and speed win)
+    for col in CATEGORICAL_COLUMNS:
+        if col in df.columns:
+            df[col] = df[col].astype('category')
+
+    return df
+
+
+@st.cache_data(show_spinner=False, ttl=3600)
+def load_all_data_cached(cache_key: str, labels: tuple, paths: tuple) -> Dict:
+    """
+    Load all scenario data with Streamlit caching.
+
+    Args:
+        cache_key: Hash of file modification times for cache invalidation
+        labels: Tuple of scenario labels
+        paths: Tuple of file paths (must match labels order)
+
+    Returns:
+        Dict with 'df_combined' and 'baselines'
+    """
+    all_dfs = []
+
+    for label, path in zip(labels, paths):
+        df = load_parquet_optimised(path, label)
+        all_dfs.append(df)
+
+    # Combine all scenarios
+    df_combined = pd.concat(all_dfs, ignore_index=True)
+
+    # Ensure Scenario is categorical after concat
+    if 'Scenario' in df_combined.columns:
+        df_combined['Scenario'] = df_combined['Scenario'].astype('category')
+
+    # Get baselines
+    if hasattr(df_combined["Location"], 'cat'):
+        locations = df_combined["Location"].cat.categories
+    else:
+        locations = df_combined["Location"].unique()
+
+    baselines = {}
+    for loc in locations:
+        baseline = get_preindustrial_baseline(loc)
+        if baseline is not None:
+            baselines[loc] = baseline
+
+    return {
+        "df_combined": df_combined,
+        "baselines": baselines
+    }
+
+
+def load_and_process_all_data(
+        labels: List[str],
+        label_to_path: Dict[str, str]
+) -> Dict:
+    """
+    Load all data from parquet files with optimisations.
+
+    Optimisations:
+    1. Uses PyArrow for faster parquet reads
+    2. Only loads required columns
+    3. Converts strings to categoricals (faster groupby, less memory)
+    4. Uses Streamlit's built-in caching with hash-based invalidation
+
+    Returns:
+        - df_raw: Combined data using Value column
+        - df_bc: Combined data with Value_BC -> Value
+        - baselines: Pre-industrial baselines from config
+    """
+    # Create cache key from file modification times
+    cache_parts = []
+    for label in sorted(labels):
+        path = label_to_path[label]
+        mtime = os.path.getmtime(path)
+        cache_parts.append(f"{label}:{mtime}")
+    cache_parts.append("v7_optimised")
+    cache_key = hashlib.md5("|".join(cache_parts).encode()).hexdigest()[:16]
+
+    # Load via cached function
+    # Convert to tuples for Streamlit cache (lists are not hashable)
+    sorted_labels = tuple(sorted(labels))
+    sorted_paths = tuple(label_to_path[lbl] for lbl in sorted_labels)
+
+    cached = load_all_data_cached(cache_key, sorted_labels, sorted_paths)
+
+    df_combined = cached["df_combined"]
+    baselines = cached["baselines"]
+
+    # Create raw view (just reference the original)
+    df_raw = df_combined
+
+    # Create BC view (copy Value_BC to Value)
+    # This is the only copy we need
+    if "Value_BC" in df_combined.columns:
+        df_bc = df_combined.copy()
+        df_bc["Value"] = df_bc["Value_BC"]
+    else:
+        df_bc = df_combined
+
+    return {
+        "df_raw": df_raw,
+        "df_bc": df_bc,
+        "baselines": baselines,
+    }
+
+
+# ============================================================================
 # SECTION 3: DATA TRANSFORMATIONS
 # ============================================================================
 
@@ -453,25 +617,28 @@ def apply_baseline_from_start(view: pd.DataFrame, baseline_year: int = None) -> 
 
 
 def apply_smoothing(df: pd.DataFrame, window: int) -> pd.DataFrame:
-    """Apply rolling average smoothing to time series."""
+    """
+    Apply rolling average smoothing to time series.
+
+    Optimised version using groupby().transform() instead of explicit loops.
+    """
     if window <= 1 or df.empty:
         return df
 
     window = window if window % 2 == 1 else window + 1
     min_periods = max(1, window // 2)
 
-    group_cols = ["Scenario"] + ["Location", "Type", "Name", "Season", "Data Type"]
+    group_cols = ["Scenario", "Location", "Type", "Name", "Season", "Data Type"]
 
-    smoothed_groups = []
-    for _, group in df.groupby(group_cols, dropna=False):
-        group = group.sort_values("Year").copy()
-        group["Value"] = group["Value"].rolling(
-            window, center=True, min_periods=min_periods
-        ).mean()
-        smoothed_groups.append(group)
+    # Sort once
+    df = df.sort_values(group_cols + ["Year"]).copy()
 
-    result = pd.concat(smoothed_groups, ignore_index=True)
-    return result.dropna(subset=["Value"])
+    # Apply rolling mean via transform (faster than explicit loop)
+    df["Value"] = df.groupby(group_cols, observed=True)["Value"].transform(
+        lambda x: x.rolling(window, center=True, min_periods=min_periods).mean()
+    )
+
+    return df.dropna(subset=["Value"])
 
 
 def align_smoothed_to_agcd(df: pd.DataFrame, alignment_year: int = 2014) -> pd.DataFrame:

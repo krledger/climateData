@@ -1,5 +1,5 @@
 {
-  "created": "2025-11-25T09:12:41Z",
+  "created": "2025-11-27T23:59:33Z",
   "source": "metrics_from_parquet_multi",
   "input": {
     "file": "raw_daily.parquet",
@@ -19,15 +19,15 @@
       {
         "name": "Year",
         "dtype": "int64",
-        "non_null": 18964,
+        "non_null": 18920,
         "nulls": 0,
         "min": 2015.0,
-        "max": 2101.0
+        "max": 2100.0
       },
       {
         "name": "Season",
         "dtype": "object",
-        "non_null": 18964,
+        "non_null": 18920,
         "nulls": 0,
         "min": null,
         "max": null
@@ -35,7 +35,7 @@
       {
         "name": "Data Type",
         "dtype": "object",
-        "non_null": 18964,
+        "non_null": 18920,
         "nulls": 0,
         "min": null,
         "max": null
@@ -43,7 +43,7 @@
       {
         "name": "Metric",
         "dtype": "object",
-        "non_null": 18964,
+        "non_null": 18920,
         "nulls": 0,
         "min": null,
         "max": null
@@ -51,7 +51,7 @@
       {
         "name": "Type",
         "dtype": "object",
-        "non_null": 18964,
+        "non_null": 18920,
         "nulls": 0,
         "min": null,
         "max": null
@@ -59,7 +59,7 @@
       {
         "name": "Location",
         "dtype": "object",
-        "non_null": 18964,
+        "non_null": 18920,
         "nulls": 0,
         "min": null,
         "max": null
@@ -67,12 +67,12 @@
       {
         "name": "Value",
         "dtype": "float64",
-        "non_null": 18964,
+        "non_null": 18920,
         "nulls": 0,
         "min": 0.0,
         "max": 1203.0144105258958
       }
     ],
-    "rows": 18964
+    "rows": 18920
   }
 }

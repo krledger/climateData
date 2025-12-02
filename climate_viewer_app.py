@@ -3,127 +3,284 @@
 """
 Climate Metrics Viewer
 ======================
-Last Updated: 2025-11-26 21:25 AEST
-Previous Update: 2025-11-26 15:50 AEST
+climate_viewer_app.py
+Last Updated: 2025-12-02 12:00 AEST - Fixed toggle behaviour, optimised caching
 
-Streamlined multi-tab application for browsing climate metrics.
-NO CACHING - Fresh data loading each time to avoid stale data bugs.
+Architecture:
+- ALL data loaded ONCE at startup (raw and BC variants)
+- Processing applied on-demand based on toggle state
+- Processed data cached in session_state for instant toggle switching
+- Tabs are DISPLAY ONLY - no calculations
 
-Bias correction and scenario alignment are pre-computed in the metrics files
-(Value_BC column).  The viewer just selects which column to display based
-on the BC toggle.
+Toggle Behaviour (when ALL OFF = raw data):
+- BC toggle OFF: Use Value column (raw model output)
+- BC toggle ON: Use Value_BC column (bias-corrected)
+- Smooth toggle: Apply/skip rolling average
+- Align toggle: Apply/skip AGCD alignment (only with smoothing)
 
-Time Horizons: Slider minimum is 2015 (SSP scenarios start 2015).
-Slider cascading: changing end of one slider updates start of next slider.
-
-Global tab passes smoothing parameters (smooth, smooth_win) to ensure
-consistency with Metrics tab display.
-
-Consolidated structure with minimal modules.
+Caching Strategy:
+- Base data (raw/BC) loaded once at startup
+- Each toggle combination cached separately
+- Year range filtering applied AFTER cache lookup (instant)
 """
 
 import os
 import sys
-import json
-import re
-from typing import Literal
+from datetime import datetime
+from typing import Dict, List, Optional, Tuple
 
-try:
-    import streamlit as st
-    import pandas as pd
-except ImportError:
-    sys.exit("Missing dependencies.  Run: pip install streamlit pandas pyarrow altair")
+import streamlit as st
+import pandas as pd
+import numpy as np
 
-from climate_viewer_constants import MODE, TIME_HORIZONS, METRIC_PRIORITIES, SEASONS, BASELINE_PERIOD, REFERENCE_YEAR, \
-    EMOJI
+from climate_viewer_constants import (
+    MODE, TIME_HORIZONS, METRIC_PRIORITIES, SEASONS, BASELINE_PERIOD,
+    EMOJI, DEFAULT_START_YEAR, DEFAULT_END_YEAR, YEAR_BUFFER, DEFAULT_SCENARIOS_ON,
+    WARMING_THRESHOLDS, AMPLIFICATION_FACTOR, get_preindustrial_baseline
+)
 from climate_viewer_data_operations import (
     resolve_folder,
     discover_scenarios,
-    ensure_schema,
     load_metrics_file,
     load_minimal_metadata,
-    calculate_preindustrial_baselines_by_location,
-    parse_data_type,
-    dedupe_preserve_order,
-    slugify,
+    apply_smoothing,
+    align_smoothed_to_agcd,
 )
 from climate_viewer_tab_metrics import render_metrics_tab
 from climate_viewer_tab_dashboard import render_dashboard_tab
 from climate_viewer_tab_global import render_global_tab
 from climate_viewer_tab_guide import render_user_guide
 
+# ============================================================================
+# CONSTANTS
+# ============================================================================
+
+GLOBAL_THRESHOLDS = [1.5, 2.0, 2.5]
+DEFAULT_SMOOTH_WIN = 20
+
 
 # ============================================================================
-# UI HELPER FUNCTIONS (formerly climate_viewer_ui_components.py)
+# THRESHOLD CROSSING CALCULATION
+# ============================================================================
+
+def calculate_threshold_crossings(
+        df: pd.DataFrame,
+        location: str,
+        baseline: float,
+        thresholds: List[float] = GLOBAL_THRESHOLDS,
+        amplification: float = AMPLIFICATION_FACTOR
+) -> Dict[str, Dict[float, Optional[int]]]:
+    """
+    Calculate when each scenario crosses each global warming threshold.
+
+    Args:
+        df: DataFrame with smoothed+aligned data (Value column)
+        location: Location to analyse
+        baseline: Pre-industrial baseline temperature for this location
+        thresholds: List of global warming thresholds (e.g. [1.5, 2.0, 2.5])
+        amplification: Regional amplification factor
+
+    Returns:
+        Dict[scenario -> Dict[threshold -> crossing_year or None]]
+    """
+    results = {}
+
+    # Get scenarios (exclude AGCD and historical)
+    all_scenarios = df["Scenario"].unique()
+    scenarios = [s for s in all_scenarios
+                 if "agcd" not in s.lower() and "historical" not in s.lower()]
+
+    for scenario in scenarios:
+        results[scenario] = {}
+
+        # Get annual average temperature for this scenario/location
+        scen_data = df[
+            (df["Scenario"] == scenario) &
+            (df["Location"] == location) &
+            (df["Type"] == "Temp") &
+            (df["Name"] == "Average") &
+            (df["Season"] == "Annual")
+            ].copy()
+
+        if scen_data.empty:
+            for t in thresholds:
+                results[scenario][t] = None
+            continue
+
+        # Sort by year
+        scen_data = scen_data.sort_values("Year")
+
+        # Calculate global warming from regional temperature
+        scen_data["Regional_Warming"] = scen_data["Value"] - baseline
+        scen_data["Global_Warming"] = scen_data["Regional_Warming"] / amplification
+
+        for threshold in thresholds:
+            # Find first year where global warming >= threshold
+            crossing = scen_data[scen_data["Global_Warming"] >= threshold]
+
+            if not crossing.empty:
+                results[scenario][threshold] = int(crossing.iloc[0]["Year"])
+            else:
+                results[scenario][threshold] = None
+
+    return results
+
+
+# ============================================================================
+# DATA LOADING AND PRE-PROCESSING
+# ============================================================================
+
+@st.cache_data(show_spinner=False)
+def load_parquet_cached(path: str, mtime: float) -> pd.DataFrame:
+    """Load parquet file with caching based on path and modification time."""
+    return pd.read_parquet(path, engine="pyarrow")
+
+
+def load_and_process_all_data(
+        labels: List[str],
+        label_to_path: Dict[str, str]
+) -> Dict:
+    """
+    Load all data from parquet files.
+
+    Returns:
+        - df_raw: Raw values (Value column)
+        - df_bc: Bias-corrected values (Value_BC -> Value)
+        - baselines: Pre-industrial baselines from config
+
+    Smoothing and alignment are applied on-demand based on user toggles.
+    Uses disk cache for instant reloads.
+    """
+    import hashlib
+    import pickle
+    from pathlib import Path
+
+    # Create cache key from file modification times
+    cache_parts = []
+    for label in sorted(labels):
+        path = label_to_path[label]
+        mtime = os.path.getmtime(path)
+        cache_parts.append(f"{label}:{mtime}")
+    cache_parts.append("v5")  # Cache version - incremented for new structure
+    cache_key = hashlib.md5("|".join(cache_parts).encode()).hexdigest()[:12]
+
+    # Cache file location
+    cache_dir = Path(label_to_path[labels[0]]).parent.parent / ".cache"
+    cache_dir.mkdir(exist_ok=True)
+    cache_file = cache_dir / f"viewer_cache_{cache_key}.pkl"
+
+    # Try to load from cache
+    if cache_file.exists():
+        try:
+            with open(cache_file, "rb") as f:
+                cached = pickle.load(f)
+            required_keys = ["df_raw", "df_bc", "baselines"]
+            if all(k in cached for k in required_keys):
+                return cached
+        except Exception:
+            pass
+
+    # Load all files once
+    all_dfs = []
+    for label in labels:
+        path = label_to_path[label]
+        mtime = os.path.getmtime(path)
+        df = load_parquet_cached(path, mtime)
+
+        if 'Metric' in df.columns and 'Name' not in df.columns:
+            df = df.rename(columns={'Metric': 'Name'})
+
+        df["Scenario"] = label
+        all_dfs.append(df)
+
+    df_combined = pd.concat(all_dfs, ignore_index=True)
+
+    # Variant 1: Raw (use Value column as-is)
+    df_raw = df_combined.copy()
+
+    # Variant 2: BC (Value_BC -> Value)
+    df_bc = df_combined.copy()
+    if "Value_BC" in df_bc.columns:
+        df_bc["Value"] = df_bc["Value_BC"]
+
+    # Get all locations
+    locations = df_combined["Location"].dropna().unique()
+
+    # Get baselines from config
+    baselines = {}
+    for loc in locations:
+        baseline = get_preindustrial_baseline(loc)
+        if baseline is not None:
+            baselines[loc] = baseline
+
+    result = {
+        "df_raw": df_raw,
+        "df_bc": df_bc,
+        "baselines": baselines,
+    }
+
+    # Save to cache
+    try:
+        with open(cache_file, "wb") as f:
+            pickle.dump(result, f)
+    except Exception:
+        pass
+
+    return result
+
+
+# ============================================================================
+# UI HELPERS
 # ============================================================================
 
 def multi_selector(
         container,
         label: str,
-        options,
-        default=None,
-        widget: Literal["checkbox", "toggle"] = "checkbox",
+        options: List[str],
+        default: Optional[List[str]] = None,
         columns: int = 1,
-        key_prefix: str = "sel",
-        namespace: str = None
-):
-    """Multi-select widget with checkbox or toggle options."""
-    opts = dedupe_preserve_order(options or [])
-    default = set(default or [])
+        namespace: str = "",
+        key_prefix: str = "sel"
+) -> List[str]:
+    """Create multi-select checkboxes."""
+    if default is None:
+        default = []
+
     selected = []
 
-    container.markdown(f"**{label}**")
-    cols = container.columns(columns)
-    widget_fn = container.checkbox if widget == "checkbox" else container.toggle
-
-    import hashlib
-    opts_hash = hashlib.md5(str(sorted(opts)).encode()).hexdigest()[:8]
-
-    for i, opt in enumerate(opts):
-        key = f"{namespace + '_' if namespace else ''}{key_prefix}_{i}_{opts_hash}_{slugify(opt)}"
-        with cols[i % columns]:
-            if widget_fn(str(opt), value=(opt in default), key=key):
+    if columns > 1:
+        cols = container.columns(columns)
+        for i, opt in enumerate(options):
+            col = cols[i % columns]
+            key = f"{namespace}_{key_prefix}_{opt}"
+            default_val = opt in default
+            if col.checkbox(opt, value=default_val, key=key):
                 selected.append(opt)
+    else:
+        for opt in options:
+            key = f"{namespace}_{key_prefix}_{opt}"
+            default_val = opt in default
+            if container.checkbox(opt, value=default_val, key=key):
+                selected.append(opt)
+
     return selected
 
 
-# ============================================================================
-# HELP TEXT FUNCTIONS
-# ============================================================================
-
-def load_help_text():
-    """Load help text from external JSON file."""
-    help_file = os.path.join(os.path.dirname(__file__), "climate_viewer_help_text.json")
-    if os.path.exists(help_file):
-        with open(help_file, "r", encoding="utf-8") as f:
-            return json.load(f)
-    else:
-        return {}
-
-
-HELP_TEXT = load_help_text()
-
-
-def get_help(path: str, default: str = "") -> str:
-    """
-    Get help text from nested JSON structure using dot notation.
-    Example: get_help("sidebar.locations.help")
-    """
+def safe_session_get(key: str, default):
+    """Safely get value from session state with default."""
     try:
-        keys = path.split(".")
-        value = HELP_TEXT
-        for key in keys:
-            value = value[key]
-        return value
+        if key in st.session_state:
+            return st.session_state[key]
     except (KeyError, TypeError):
-        return default
+        pass
+    return default
 
 
 # ============================================================================
 # DISCLAIMER
 # ============================================================================
 
-def run_disclaimer(st):
+def run_disclaimer():
     """Display data disclaimer and get user acceptance."""
     if "disclaimer_accepted" not in st.session_state:
         st.session_state.disclaimer_accepted = False
@@ -159,31 +316,64 @@ By selecting "Accept", you acknowledge that the climate data provided through th
 
 def run_metrics_viewer():
     """Main application entry point."""
-    run_disclaimer(st)
+    run_disclaimer()
 
-    # Load data WITHOUT CACHING
-    base_folder = resolve_folder()
-    scenarios = discover_scenarios(base_folder)
+    # ========================================================================
+    # INITIAL DATA LOADING (once per session)
+    # ========================================================================
 
-    if not scenarios:
-        st.error(f"{EMOJI['warning']} No scenarios found in: {base_folder}")
-        st.stop()
+    if "data_loaded" not in st.session_state:
+        loading_msg = st.empty()
+        loading_msg.info("🌍 Loading climate data...")
 
-    labels = [lbl for lbl, _, _ in scenarios]
-    label_to_path = {lbl: path for lbl, _, path in scenarios}
+        # Discover scenarios
+        base_folder = resolve_folder()
+        scenarios = discover_scenarios(base_folder)
+
+        if not scenarios:
+            st.error(f"{EMOJI['warning']} No scenarios found in: {base_folder}")
+            st.stop()
+
+        labels = [lbl for lbl, _, _ in scenarios]
+        label_to_path = {lbl: path for lbl, _, path in scenarios}
+
+        # Load metadata for UI
+        metadata_tuples = [
+            (lbl, label_to_path[lbl], os.path.getmtime(label_to_path[lbl]))
+            for lbl in labels
+        ]
+        metadata = load_minimal_metadata(metadata_tuples)
+
+        # Load and process all data
+        processed = load_and_process_all_data(labels, label_to_path)
+
+        # Store everything in session state
+        st.session_state["labels"] = labels
+        st.session_state["label_to_path"] = label_to_path
+        st.session_state["metadata"] = metadata
+        st.session_state["processed_data"] = processed
+        st.session_state["data_loaded"] = True
+
+        loading_msg.empty()
+
+    # Retrieve from session state
+    labels = st.session_state["labels"]
+    label_to_path = st.session_state["label_to_path"]
+    metadata = st.session_state["metadata"]
+    processed = st.session_state["processed_data"]
+
     BASE_LABEL = "SSP1-26" if "SSP1-26" in labels else labels[0]
 
-    # Load minimal metadata for UI setup
-    metadata_tuples = [
-        (lbl, label_to_path[lbl], os.path.getmtime(label_to_path[lbl]))
-        for lbl in labels
-    ]
-    metadata = load_minimal_metadata(metadata_tuples)
+    # ========================================================================
+    # TABS
+    # ========================================================================
 
-    # Create tabs
-    tab1, tab2, tab3, tab4 = st.tabs(
-        [f"{EMOJI['thermometer']} Climate Metrics", f"{EMOJI['chart']} Dashboard",
-         f"{EMOJI['globe']} Global Milestones", f"{EMOJI['book']} User Guide"])
+    tab1, tab2, tab3, tab4 = st.tabs([
+        f"{EMOJI['thermometer']} Climate Metrics",
+        f"{EMOJI['chart']} Dashboard",
+        f"{EMOJI['globe']} Global Milestones",
+        f"{EMOJI['book']} User Guide"
+    ])
 
     # ========================================================================
     # TAB 1: METRICS VIEWER
@@ -193,19 +383,18 @@ def run_metrics_viewer():
 
         st.sidebar.title(f"{EMOJI['gear']} Filters")
 
+        # Location selector
         with st.sidebar.expander(f"{EMOJI['pin']} Locations", expanded=False):
             all_locations = sorted(metadata["Location"].dropna().unique())
             default_locs = ["Ravenswood"] if "Ravenswood" in all_locations else all_locations[:1]
-
-            loc_sel = multi_selector(
-                st, "Select locations", all_locations,
-                default=default_locs, columns=1, namespace=ns, key_prefix="loc"
-            )
+            loc_sel = multi_selector(st, "Locations", all_locations, default_locs,
+                                     namespace=ns, key_prefix="loc")
 
         if not loc_sel:
             st.sidebar.warning(f"{EMOJI['warning']} Select at least one location")
             st.stop()
 
+        # Scenario selector
         with st.sidebar.expander(f"{EMOJI['globe']} Scenarios", expanded=False):
             default_scen = [BASE_LABEL]
             if "historical" in [lbl.lower() for lbl in labels]:
@@ -214,64 +403,95 @@ def run_metrics_viewer():
             elif len(labels) > 1:
                 default_scen.append(labels[1])
 
-            scen_sel = multi_selector(
-                st, "Select scenarios", labels,
-                default=default_scen, columns=1, namespace=ns, key_prefix="scen"
-            )
+            scen_sel = multi_selector(st, "Scenarios", labels, default_scen,
+                                      namespace=ns, key_prefix="scen")
 
         if not scen_sel:
             st.sidebar.warning(f"{EMOJI['warning']} Select at least one scenario")
             st.stop()
 
+        # Display options
         with st.sidebar.expander(f"{EMOJI['display']} Display Options", expanded=False):
             mode = st.radio(
                 "Display Mode",
                 ["Values", "Baseline (start year)", f"Deltas vs {BASE_LABEL}"],
                 index=0,
                 key=f"{ns}_mode",
-                help=get_help("sidebar.display_options.display_mode.help", "Choose how to display values")
+                help="Choose how to display values"
             )
 
             smooth = st.toggle(
                 "Smooth Values",
-                value=False,
+                value=True,
                 key=f"{ns}_smooth",
-                help=get_help("sidebar.display_options.smooth_values", "Apply rolling average smoothing")
+                help="Apply rolling average smoothing (IPCC AR6 standard is 20 years)"
             )
             if smooth:
-                smooth_win = st.slider(
+                smooth_win = st.select_slider(
                     "Smoothing Window (years)",
-                    3, 21, step=2, value=9,
+                    options=[5, 10, 15, 20, 25],
+                    value=20,
                     key=f"{ns}_smooth_win",
-                    help=get_help("sidebar.display_options.smoothing_window", "Number of years in rolling average")
+                    help="Number of years in rolling average"
                 )
             else:
                 smooth_win = 1
 
-            show_15c_shading = st.toggle(
-                "Show 1.5C Target",
-                value=False,
-                key=f"{ns}_show_15c",
-                help="Show red line at 1.5 deg C global warming target (temperature metrics only)"
+            show_global_thresholds = st.toggle(
+                "Global Thresholds",
+                value=True,
+                key=f"{ns}_show_thresholds",
+                help="Show 1.5°C, 2.0°C and 2.5°C global warming thresholds (temperature metrics only)"
             )
 
             show_horizon_shading = st.toggle(
-                "Show Time Horizons",
-                value=False,
+                "Time Horizons",
+                value=True,
                 key=f"{ns}_show_horizons",
                 help="Shade time horizons on charts (annual data only)"
             )
 
-        with st.sidebar.expander(f"{EMOJI['calendar']} Year Range", expanded=False):
-            yr_min, yr_max = int(metadata["Year"].min()), int(metadata["Year"].max())
+            bc_enabled = st.toggle(
+                "Bias Correction",
+                value=True,
+                key=f"{ns}_bc_enabled",
+                help="Display bias-corrected values (pre-computed in metrics files)"
+            )
 
-            # Default start year is REFERENCE_YEAR (or yr_min if data starts after that)
-            default_start_year = max(REFERENCE_YEAR, yr_min) if yr_min <= REFERENCE_YEAR else yr_min
+            align_to_agcd = st.toggle(
+                "Align to Actual",
+                value=True,
+                key=f"{ns}_align_agcd",
+                help="Align smoothed scenario traces to AGCD observations at 2014/2015 transition (requires smoothing)"
+            )
+
+            # Status indicators
+            status_parts = []
+            if bc_enabled:
+                status_parts.append("Bias-corrected")
+            else:
+                status_parts.append("Raw model output")
+            if smooth:
+                status_parts.append(f"{smooth_win}yr smoothing")
+            if smooth and align_to_agcd:
+                status_parts.append("AGCD-aligned")
+            elif not smooth and align_to_agcd:
+                st.caption("⚠️ Alignment requires smoothing")
+
+            st.caption(" | ".join(status_parts))
+
+        # Year Range with Time Horizons
+        with st.sidebar.expander(f"{EMOJI['calendar']} Year Range", expanded=False):
+            yr_min = int(metadata["Year"].min())
+            yr_max = int(metadata["Year"].max())
+
+            default_start_year = max(DEFAULT_START_YEAR, yr_min) if yr_min <= DEFAULT_START_YEAR else yr_min
+            default_end_year = min(DEFAULT_END_YEAR, yr_max)
 
             if f"{ns}_y0" not in st.session_state:
                 st.session_state[f"{ns}_y0"] = default_start_year
             if f"{ns}_y1" not in st.session_state:
-                st.session_state[f"{ns}_y1"] = yr_max
+                st.session_state[f"{ns}_y1"] = default_end_year
 
             col_start, col_end = st.columns(2)
             with col_start:
@@ -309,38 +529,19 @@ def run_metrics_viewer():
             # Initialise slider session state if not present
             if f"{ns}_short_mid" not in st.session_state:
                 st.session_state[f"{ns}_short_mid"] = (
-                    max(TIME_HORIZONS['short_start_default'], horizon_min),
-                    max(TIME_HORIZONS['mid_start_default'], horizon_min + 1)
+                    max(TIME_HORIZONS.get('short_start_default', 2020), horizon_min),
+                    max(TIME_HORIZONS.get('mid_start_default', 2036), horizon_min + 1)
                 )
             if f"{ns}_mid_long" not in st.session_state:
                 st.session_state[f"{ns}_mid_long"] = (
-                    max(TIME_HORIZONS['mid_start_default'], horizon_min + 1),
-                    max(TIME_HORIZONS['long_start_default'], horizon_min + 2)
+                    max(TIME_HORIZONS.get('mid_start_default', 2036), horizon_min + 1),
+                    max(TIME_HORIZONS.get('long_start_default', 2039), horizon_min + 2)
                 )
             if f"{ns}_long_end" not in st.session_state:
                 st.session_state[f"{ns}_long_end"] = (
-                    max(TIME_HORIZONS['long_start_default'], horizon_min + 2),
-                    min(TIME_HORIZONS['horizon_end_default'], y1)
+                    max(TIME_HORIZONS.get('long_start_default', 2039), horizon_min + 2),
+                    min(TIME_HORIZONS.get('horizon_end_default', 2045), y1)
                 )
-
-            # Read current values from session state
-            short_mid_val = st.session_state[f"{ns}_short_mid"]
-            mid_long_val = st.session_state[f"{ns}_mid_long"]
-            long_end_val = st.session_state[f"{ns}_long_end"]
-
-            # CASCADE: If short_mid END changed, update mid_long START
-            if short_mid_val[1] != mid_long_val[0]:
-                new_mid_start = short_mid_val[1]
-                new_mid_end = max(mid_long_val[1], new_mid_start + 1)
-                st.session_state[f"{ns}_mid_long"] = (new_mid_start, new_mid_end)
-                mid_long_val = st.session_state[f"{ns}_mid_long"]
-
-            # CASCADE: If mid_long END changed, update long_end START
-            if mid_long_val[1] != long_end_val[0]:
-                new_long_start = mid_long_val[1]
-                new_long_end = max(long_end_val[1], new_long_start + 1)
-                st.session_state[f"{ns}_long_end"] = (new_long_start, new_long_end)
-                long_end_val = st.session_state[f"{ns}_long_end"]
 
             # Clamp all values to valid range
             def clamp_slider(val, min_v, max_v):
@@ -394,6 +595,7 @@ def run_metrics_viewer():
 
             st.caption(f"Planning horizon: {horizon_end}")
 
+        # Metric type
         with st.sidebar.expander(f"{EMOJI['chart']} Metric Type", expanded=False):
             preferred_types = ["Temp", "Rain", "Wind", "Humidity"]
             all_types = list(metadata["Type"].unique())
@@ -409,24 +611,10 @@ def run_metrics_viewer():
                 help="Select the climate variable category to analyse"
             )
 
-            # Bias Correction Toggle
-            st.markdown("---")
-            bc_enabled = st.toggle(
-                "Bias Correction",
-                value=False,
-                key=f"{ns}_bc_enabled",
-                help="Display bias-corrected values (pre-computed in metrics files).  "
-                     "Corrections adjust for systematic model biases based on AGCD observations (1971-2014).  "
-                     "SSP scenarios are aligned to AGCD at the 2014-2015 transition."
-            )
-
-            if bc_enabled:
-                st.caption("Displaying bias-corrected values (Value_BC column)")
-
+        # Metric names
         with st.sidebar.expander(f"{EMOJI['graph']} Metric Names", expanded=False):
             filtered_meta = metadata[
-                (metadata["Location"].isin(loc_sel)) &
-                (metadata["Type"] == type_sel)
+                (metadata["Location"].isin(loc_sel)) & (metadata["Type"] == type_sel)
                 ]
             name_options = sorted(filtered_meta["Name"].dropna().unique())
 
@@ -442,8 +630,8 @@ def run_metrics_viewer():
                 default_names = name_options[:1]
 
             name_sel = multi_selector(
-                st, "Select metrics", name_options,
-                default=default_names, widget="toggle",
+                st, "Metrics", name_options,
+                default=default_names,
                 columns=1, namespace=ns, key_prefix="name"
             )
 
@@ -451,12 +639,14 @@ def run_metrics_viewer():
             st.sidebar.warning(f"{EMOJI['warning']} Select at least one metric")
             st.stop()
 
+        # Seasons
         with st.sidebar.expander(f"{EMOJI['calendar']} Seasons", expanded=False):
-            available_seasons = [s for s in SEASONS['all'] if s in metadata["Season"].unique()]
-            default_seasons = ["Annual"] if "Annual" in available_seasons else available_seasons
+            available_seasons = [s for s in SEASONS.get('all', ["Annual", "DJF", "MAM", "JJA", "SON"])
+                                 if s in metadata["Season"].unique()]
+            default_seasons = ["Annual"] if "Annual" in available_seasons else available_seasons[:1]
 
             season_sel = multi_selector(
-                st, "Select seasons", available_seasons,
+                st, "Seasons", available_seasons,
                 default=default_seasons, columns=1,
                 namespace=ns, key_prefix="season"
             )
@@ -465,38 +655,54 @@ def run_metrics_viewer():
             st.sidebar.warning(f"{EMOJI['warning']} Select at least one season")
             st.stop()
 
-        # Load data WITHOUT CACHING
-        with st.spinner("Loading data..."):
-            dfs = []
+        # ================================================================
+        # PROCESS DATA based on toggles (on-demand with caching)
+        # ================================================================
+        # Cache key includes all processing options
+        # Year range is NOT in cache key - filtering happens after
 
-            for label in scen_sel:
-                path = label_to_path[label]
-                df = load_metrics_file(path, use_bc=bc_enabled)
-                df["Scenario"] = label
-                dfs.append(df)
+        cache_key = f"processed_{bc_enabled}_{smooth}_{smooth_win}_{align_to_agcd}_{tuple(sorted(loc_sel))}"
 
-            df_all = pd.concat(dfs, ignore_index=True)
+        if cache_key not in st.session_state:
+            # Start with raw or BC data based on toggle
+            if bc_enabled:
+                df_work = processed["df_bc"].copy()
+            else:
+                df_work = processed["df_raw"].copy()
 
-            # Load base scenario for delta calculations
-            base_path = label_to_path[BASE_LABEL]
-            base_df = load_metrics_file(base_path, use_bc=bc_enabled)
-            base_df["Scenario"] = BASE_LABEL
+            # Filter to selected locations (full year range for smoothing)
+            df_work = df_work[df_work["Location"].isin(loc_sel)].copy()
 
-            preindustrial_baseline = calculate_preindustrial_baselines_by_location(
-                df_all, BASELINE_PERIOD, loc_sel
-            )
+            # Apply smoothing if enabled
+            if smooth and smooth_win > 1:
+                df_work = apply_smoothing(df_work, smooth_win)
 
-        # Create wrapper function for tabs that need to load additional data
-        def load_metrics_func_with_bc(path):
-            df = load_metrics_file(path, use_bc=bc_enabled)
-            # Infer scenario from path
-            scenario_name = os.path.basename(os.path.dirname(path))
-            df["Scenario"] = scenario_name
-            return df
+                # Apply alignment if enabled (only makes sense with smoothing)
+                if align_to_agcd:
+                    df_work = align_smoothed_to_agcd(df_work, alignment_year=2014)
 
+            # Cache the processed data
+            st.session_state[cache_key] = df_work
+
+        df_all_full = st.session_state[cache_key]
+
+        # Filter to selected scenarios and year range (instant - no processing)
+        df_all = df_all_full[
+            (df_all_full["Scenario"].isin(scen_sel)) &
+            (df_all_full["Year"] >= y0) &
+            (df_all_full["Year"] <= y1)
+            ].copy()
+
+        # Get base scenario data
+        base_df = df_all[df_all["Scenario"] == BASE_LABEL].copy()
+
+        # Get baselines
+        preindustrial_baseline = processed["baselines"]
+
+        # Render metrics tab (display only - data already processed)
         render_metrics_tab(
             st, ns, loc_sel, scen_sel, type_sel, name_sel, season_sel, y0, y1,
-            mode, smooth, smooth_win, show_15c_shading, show_horizon_shading,
+            mode, smooth, smooth_win, show_global_thresholds, show_horizon_shading,
             short_start, mid_start, long_start, horizon_end,
             df_all, base_df, preindustrial_baseline, BASE_LABEL
         )
@@ -505,20 +711,85 @@ def run_metrics_viewer():
     # TAB 2: DASHBOARD
     # ========================================================================
     with tab2:
+        # Dashboard uses same cache as metrics tab (already processed)
+        cache_key = f"processed_{bc_enabled}_{smooth}_{smooth_win}_{align_to_agcd}_{tuple(sorted(loc_sel))}"
+
+        if cache_key in st.session_state:
+            df_dash_full = st.session_state[cache_key]
+        else:
+            # Fallback - should not happen if metrics tab ran first
+            df_dash_full = processed["df_bc"] if bc_enabled else processed["df_raw"]
+            df_dash_full = df_dash_full[df_dash_full["Location"].isin(loc_sel)]
+
+        # Filter to scenarios and year range (instant)
+        df_dash = df_dash_full[
+            (df_dash_full["Scenario"].isin(scen_sel)) &
+            (df_dash_full["Year"] >= y0) &
+            (df_dash_full["Year"] <= y1)
+            ]
+
         render_dashboard_tab(
-            st, scen_sel, loc_sel, None, df_all, labels, label_to_path,
-            load_metrics_func_with_bc, y0, mid_start, long_start, horizon_end
+            st=st,
+            scen_sel=scen_sel,
+            loc_sel=loc_sel,
+            df_all=df_dash,
+            labels=labels,
+            label_to_path=label_to_path,
+            short_start=short_start,
+            mid_start=mid_start,
+            long_start=long_start,
+            horizon_end=horizon_end
         )
 
-        # ========================================================================
-        # TAB 3: GLOBAL WARMING THRESHOLDS
-        # ========================================================================
-        with tab3:
-            render_global_tab(
-                st, scen_sel, loc_sel, df_all, labels, label_to_path, load_metrics_func_with_bc,
-                y0, y1, short_start, mid_start, long_start, horizon_end,
-                smooth=smooth, smooth_win=smooth_win
-            )
+    # ========================================================================
+    # TAB 3: GLOBAL MILESTONES
+    # ========================================================================
+    with tab3:
+        # Global tab uses same cache as metrics (already has full year range)
+        cache_key = f"processed_{bc_enabled}_{smooth}_{smooth_win}_{align_to_agcd}_{tuple(sorted(loc_sel))}"
+
+        if cache_key in st.session_state:
+            df_global_full = st.session_state[cache_key]
+        else:
+            # Fallback - should not happen if metrics tab ran first
+            df_global_full = processed["df_bc"] if bc_enabled else processed["df_raw"]
+            df_global_full = df_global_full[df_global_full["Location"].isin(loc_sel)]
+
+        # Filter to scenarios (year filtering done by render_global_tab)
+        df_global = df_global_full[df_global_full["Scenario"].isin(scen_sel)]
+
+        # Calculate crossing years based on current smoothing settings
+        crossing_cache_key = f"crossings_{bc_enabled}_{smooth}_{smooth_win}_{align_to_agcd}_{tuple(sorted(loc_sel))}"
+
+        if crossing_cache_key not in st.session_state:
+            crossing_years = {}
+            baselines = processed["baselines"]
+            for loc in loc_sel:
+                if loc in baselines:
+                    crossing_years[loc] = calculate_threshold_crossings(
+                        df_global_full, loc, baselines[loc]
+                    )
+            st.session_state[crossing_cache_key] = crossing_years
+
+        crossing_years = st.session_state[crossing_cache_key]
+        baselines = processed["baselines"]
+
+        render_global_tab(
+            st=st,
+            scen_sel=scen_sel,
+            loc_sel=loc_sel,
+            df_all=df_global,
+            crossing_years=crossing_years,
+            baselines=baselines,
+            y0=y0,
+            y1=y1,
+            short_start=short_start,
+            mid_start=mid_start,
+            long_start=long_start,
+            horizon_end=horizon_end,
+            smooth_win=smooth_win,
+            show_horizon_shading=show_horizon_shading
+        )
 
     # ========================================================================
     # TAB 4: USER GUIDE

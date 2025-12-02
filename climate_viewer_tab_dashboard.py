@@ -1,454 +1,250 @@
 # -*- coding: utf-8 -*-
 """
-Climate Viewer Dashboard Tab - Optimised Version
-=================================================
-Last Updated: 2025-11-26 15:15 AEST
+Climate Viewer Dashboard Tab
+=============================
+climate_viewer_tab_dashboard.py
+Last Updated: 2025-12-02 14:30 AEST - Simplified, uses climate_viewer_maps module
 
-Displays climate metrics across time horizons with pre-industrial baseline comparison.
-Enhanced with bias-corrected rain metrics and PDF export.
-
-Performance Note:
-- Uses df_all from main app directly (avoids duplicate loading)
-- Loads Historical ONCE before location loop if needed (not per-location)
+Features:
+- Interactive map via climate_viewer_maps.create_multi_location_map()
+- Climate metrics displayed at time horizon years
+- Uses pre-processed data from main app (no calculations)
 """
 
-import os
-import numpy as np
 import pandas as pd
-from datetime import datetime
+from pathlib import Path
 
-from climate_viewer_constants import (
-    FOLIUM_AVAILABLE,
-    BASE_DIR,
-    BASELINE_PERIOD,
-    REFERENCE_YEAR,
-    DASHBOARD_METRICS,
-    should_use_inverse_delta,
-    EMOJI,
-)
-from climate_viewer_data_operations import (
-    find_metric_name,
-    calculate_metric_change,
-    calculate_preindustrial_baselines_by_metric,
-    get_5year_average,
-    format_compact_metric_card_html,
-)
-from climate_viewer_maps import create_region_map
-
-if FOLIUM_AVAILABLE:
-    from streamlit_folium import st_folium
+from climate_viewer_constants import EMOJI, DASHBOARD_METRICS, should_use_inverse_delta, FOLIUM_AVAILABLE
+from climate_viewer_maps import create_multi_location_map, get_location_colour, get_map_height
 
 
-def find_best_metric_name(data, metric_type, metric_name):
-    """
-    Find the best metric name, preferring bias-corrected versions for rain metrics.
-    """
-    available = data[data["Type"] == metric_type]["Name"].unique()
+def get_value_at_year(df: pd.DataFrame, metric_type: str, metric_name: str,
+                      scenario: str, year: int, location: str) -> float:
+    """Get the value for a metric at a specific year.  Simple lookup."""
+    mask = (
+            (df["Location"] == location) &
+            (df["Type"] == metric_type) &
+            (df["Name"] == metric_name) &
+            (df["Scenario"] == scenario) &
+            (df["Year"] == year) &
+            (df["Season"] == "Annual")
+    )
+    data = df[mask]
+    if data.empty:
+        return None
+    return data["Value"].iloc[0]
+
+
+def find_metric_name(df: pd.DataFrame, metric_type: str, preferred_name: str) -> str:
+    """Find actual metric name in data, preferring BC version for Rain."""
+    available = df[df["Type"] == metric_type]["Name"].unique()
 
     if metric_type == "Rain":
-        bc_version = f"{metric_name} (BC)"
-        if bc_version in available:
-            return bc_version
+        bc_name = f"{preferred_name} (BC)"
+        if bc_name in available:
+            return bc_name
 
-    return find_metric_name(data, metric_type, metric_name)
+    if preferred_name in available:
+        return preferred_name
+
+    for name in available:
+        if preferred_name.lower() in name.lower():
+            return name
+
+    return preferred_name
 
 
-def generate_pdf_report(
-        scenarios_data: dict,
-        locations: list,
-        baseline_year: int,
-        mid_start: int,
-        long_start: int,
-        horizon_end: int,
-        preindustrial_baselines: dict
-) -> bytes:
+def format_metric_card(name: str, value: float, change: float, unit: str,
+                       is_inverse: bool = False) -> str:
+    """Format a compact metric card as HTML."""
+    if value is None:
+        return f"""
+        <div style="background:#f8f9fa;border-radius:8px;padding:8px;margin:2px 0;text-align:center;">
+            <div style="font-size:11px;color:#666;margin-bottom:2px;">{name}</div>
+            <div style="font-size:16px;font-weight:bold;color:#999;">N/A</div>
+        </div>
+        """
+
+    if change is None:
+        colour = "#666"
+        change_str = "N/A"
+    elif change == 0:
+        colour = "#666"
+        change_str = "+0.0"
+    else:
+        if is_inverse:
+            colour = "#E74C3C" if change < 0 else "#27AE60"
+        else:
+            colour = "#E74C3C" if change > 0 else "#27AE60"
+        change_str = f"{change:+.1f}"
+
+    return f"""
+    <div style="background:#f8f9fa;border-radius:8px;padding:8px;margin:2px 0;text-align:center;">
+        <div style="font-size:11px;color:#666;margin-bottom:2px;">{name}</div>
+        <div style="font-size:16px;font-weight:bold;color:{colour};">{change_str} {unit}</div>
+        <div style="font-size:10px;color:#888;">({value:.1f})</div>
+    </div>
     """
-    Generate PDF report of dashboard metrics.
-    Uses fpdf2 library for pure Python PDF generation.
 
-    Returns:
-        PDF as bytes for download
+
+def render_location_map(st, loc_sel):
     """
-    try:
-        from fpdf import FPDF
-    except ImportError:
-        return None
+    Render the location map using the maps module.
 
-    class PDF(FPDF):
-        def header(self):
-            self.set_font('Helvetica', 'B', 16)
-            self.cell(0, 10, 'Climate Change Dashboard Report', align='C', new_x='LMARGIN', new_y='NEXT')
-            self.set_font('Helvetica', '', 10)
-            self.cell(0, 6, f'Generated: {datetime.now().strftime("%Y-%m-%d %H:%M")}', align='C', new_x='LMARGIN',
-                      new_y='NEXT')
-            self.ln(5)
+    Returns dict of loaded location info for legend display.
+    """
+    if not FOLIUM_AVAILABLE:
+        st.info(f"{EMOJI['map']} Map view requires folium and streamlit-folium packages.")
+        st.code("pip install folium streamlit-folium")
+        return {}
 
-        def footer(self):
-            self.set_y(-15)
-            self.set_font('Helvetica', 'I', 8)
-            self.cell(0, 10, f'Page {self.page_no()}', align='C')
+    from streamlit_folium import st_folium
 
-    pdf = PDF(orientation='P', unit='mm', format='A4')
-    pdf.set_auto_page_break(auto=True, margin=15)
-    pdf.add_page()
+    # Create map via maps module
+    m, loaded_locations = create_multi_location_map(loc_sel)
 
-    # Title and parameters
-    pdf.set_font('Helvetica', 'B', 12)
-    pdf.cell(0, 8, 'Analysis Parameters', new_x='LMARGIN', new_y='NEXT')
-    pdf.set_font('Helvetica', '', 10)
-    pdf.cell(0, 6, f'Baseline Year: {baseline_year}', new_x='LMARGIN', new_y='NEXT')
-    pdf.cell(0, 6, f'Time Horizons: {mid_start} (Short), {long_start} (Medium), {horizon_end} (Long)', new_x='LMARGIN',
-             new_y='NEXT')
-    pdf.cell(0, 6, f'Locations: {", ".join(locations)}', new_x='LMARGIN', new_y='NEXT')
-    pdf.ln(5)
+    if m is None:
+        st.warning(f"{EMOJI['warning']} Could not create map: {loaded_locations.get('error', 'Unknown error')}")
+        return {}
 
-    # Process each scenario
-    for scenario, data in scenarios_data.items():
-        pdf.add_page()
-        pdf.set_font('Helvetica', 'B', 14)
-        pdf.cell(0, 10, f'Scenario: {scenario}', new_x='LMARGIN', new_y='NEXT')
-        pdf.ln(3)
+    if not loaded_locations:
+        st.warning(
+            f"{EMOJI['warning']} No KML files found for selected locations.  Run generator_kml.py to create them.")
+        return {}
 
-        for location in locations:
-            if location not in data:
-                continue
+    # Display map
+    st_folium(m, width=None, height=get_map_height(), returned_objects=[])
 
-            pdf.set_font('Helvetica', 'B', 12)
-            pdf.cell(0, 8, f'Location: {location}', new_x='LMARGIN', new_y='NEXT')
-            pdf.ln(2)
-
-            # Table header
-            pdf.set_font('Helvetica', 'B', 9)
-            col_widths = [50, 35, 35, 35, 35]
-            headers = ['Metric', f'{baseline_year}', f'{mid_start}', f'{long_start}', f'{horizon_end}']
-
-            for i, header in enumerate(headers):
-                pdf.cell(col_widths[i], 7, header, border=1, align='C')
-            pdf.ln()
-
-            # Table data
-            pdf.set_font('Helvetica', '', 8)
-
-            for category, metrics in data[location].items():
-                # Category row
-                pdf.set_font('Helvetica', 'B', 8)
-                pdf.set_fill_color(240, 240, 240)
-                pdf.cell(sum(col_widths), 6, category, border=1, fill=True, new_x='LMARGIN', new_y='NEXT')
-                pdf.set_font('Helvetica', '', 8)
-
-                for metric_info in metrics:
-                    metric_name = metric_info['name']
-                    unit = metric_info['unit']
-                    values = metric_info['values']
-
-                    # Format values
-                    def fmt_val(v, is_baseline=False):
-                        if v is None:
-                            return 'N/A'
-                        if is_baseline:
-                            return f'{v:.1f}'
-                        return f'{v:+.1f}'
-
-                    pdf.cell(col_widths[0], 6, f'{metric_name} ({unit})', border=1)
-                    pdf.cell(col_widths[1], 6, fmt_val(values.get('baseline'), True), border=1, align='C')
-                    pdf.cell(col_widths[2], 6, fmt_val(values.get('short')), border=1, align='C')
-                    pdf.cell(col_widths[3], 6, fmt_val(values.get('mid')), border=1, align='C')
-                    pdf.cell(col_widths[4], 6, fmt_val(values.get('long')), border=1, align='C')
-                    pdf.ln()
-
-            pdf.ln(5)
-
-    return bytes(pdf.output())
+    return loaded_locations
 
 
 def render_dashboard_tab(
         st,
         scen_sel,
         loc_sel,
-        dashboard_location,
         df_all,
         labels,
         label_to_path,
-        load_metrics_func,
-        baseline_year,
+        short_start,
         mid_start,
         long_start,
         horizon_end
 ):
     """
-    Render the climate dashboard tab with compact layout and PDF export.
+    Render the climate dashboard tab.
 
-    Optimised to avoid duplicate data loading:
-    - Uses df_all directly from main app
-    - Loads Historical only ONCE if not already in df_all
+    Features:
+    - Interactive map showing grid cells for selected locations
+    - Metric cards at time horizon years
+    - Uses pre-processed data from main app (display only)
     """
     st.title(f"{EMOJI['chart']} Climate Change Dashboard")
 
-    st.info(f"{EMOJI['lightbulb']} **Rainfall metrics use bias-corrected (BC) data** for improved accuracy.")
-
-    dashboard_scenarios = [s for s in scen_sel if "historical" not in s.lower() and "agcd" not in s.lower()]
+    # Filter to SSP scenarios only
+    dashboard_scenarios = [s for s in scen_sel
+                           if "historical" not in s.lower() and "agcd" not in s.lower()]
 
     if not dashboard_scenarios:
-        st.warning(
-            f"{EMOJI['warning']} Please select at least one future scenario (excluding historical) to view dashboard.")
+        st.warning(f"{EMOJI['warning']} Select at least one SSP scenario to view dashboard.")
         st.stop()
 
-    # Show region map if available
-    kml_path = os.path.join(BASE_DIR, "australia_grid_coverage.kml")
-    ravenswood_kml_path = os.path.join(BASE_DIR, "ravenswood_grid_cell.kml")
+    if df_all.empty:
+        st.warning(f"{EMOJI['warning']} No data available.")
+        st.stop()
 
-    if FOLIUM_AVAILABLE and os.path.exists(kml_path):
-        with st.expander(f"{EMOJI['map']} Region Map", expanded=False):
-            st.markdown("**Grid coverage area for climate metrics**")
-            region_map, status_msg, placemark_count = create_region_map(
-                kml_path,
-                ravenswood_kml_path if os.path.exists(ravenswood_kml_path) else None
-            )
-            if region_map:
-                if placemark_count > 0:
-                    st.caption(f"Displaying {placemark_count} grid cells from KML file")
-                elif "Partial" in status_msg:
-                    st.warning(f"{EMOJI['warning']} {status_msg}")
-                st_folium(region_map, width=1100, height=600)
-            else:
-                st.info(f"Map unavailable: {status_msg}")
-    elif not FOLIUM_AVAILABLE:
-        st.info(f"{EMOJI['map']} Install folium and streamlit-folium to view region map")
+    # ========================================================================
+    # MAP VIEW
+    # ========================================================================
+    st.subheader(f"{EMOJI['map']} Location Map")
 
-    # Collect data for PDF export
-    pdf_data = {}
+    with st.expander("View Grid Coverage Map", expanded=True):
+        loaded_locations = render_location_map(st, loc_sel)
 
-    # =========================================================================
-    # OPTIMISATION: Load Historical data ONCE before location loop if needed
-    # =========================================================================
-    hist_label = None
-    for lbl in labels:
-        if "historical" in lbl.lower():
-            hist_label = lbl
-            break
+        # Dynamic legend
+        if loaded_locations:
+            st.markdown("---")
+            cols = st.columns(min(len(loaded_locations), 4))
+            for idx, (loc, info) in enumerate(loaded_locations.items()):
+                with cols[idx % len(cols)]:
+                    cell_text = f"{info['cells']} cells" if info['cells'] != 1 else "1 cell"
+                    st.markdown(
+                        f"<span style='color:{info['colour_hex']};font-size:20px;'>●</span> "
+                        f"**{loc}** — {cell_text}",
+                        unsafe_allow_html=True
+                    )
 
-    # Check if Historical is already in df_all
-    scenarios_in_df = set(df_all["Scenario"].unique()) if "Scenario" in df_all.columns else set()
-    hist_df = None
+    st.markdown("---")
 
-    if hist_label:
-        if hist_label in scenarios_in_df:
-            # Historical already loaded - extract from df_all
-            hist_df = df_all[df_all["Scenario"] == hist_label].copy()
-        elif hist_label in label_to_path:
-            # Historical not in df_all - load it ONCE here
-            hist_df = load_metrics_func(label_to_path[hist_label])
+    # ========================================================================
+    # TIME HORIZON METRICS
+    # ========================================================================
 
-    # Pre-calculate preindustrial baselines for ALL locations at once (efficient)
-    preindustrial_baselines_by_loc = {}
-    if hist_df is not None and not hist_df.empty:
-        for location in loc_sel:
-            preindustrial_baselines_by_loc[location] = calculate_preindustrial_baselines_by_metric(
-                hist_df, BASELINE_PERIOD, location
-            )
+    horizons = [
+        ("Short", short_start, "#3498DB"),
+        ("Medium", mid_start, "#F39C12"),
+        ("Long", long_start, "#E74C3C"),
+        ("End", horizon_end, "#8E44AD"),
+    ]
 
-    # Loop through all selected locations
-    for location_idx, dashboard_location in enumerate(loc_sel):
-        if location_idx > 0:
+    for loc_idx, location in enumerate(loc_sel):
+        if loc_idx > 0:
             st.markdown("---")
 
-        st.markdown(f"## {EMOJI['pin']} {dashboard_location}")
+        loc_colour = get_location_colour(location)['color']
+        st.markdown(
+            f"## <span style='color:{loc_colour};'>●</span> {location}",
+            unsafe_allow_html=True
+        )
 
-        # Prepare dashboard data
-        with st.spinner(f"Calculating metrics for {dashboard_location}..."):
-            dashboard_data = df_all[
-                (df_all["Location"] == dashboard_location) &
-                (df_all["Season"] == "Annual") &
-                (df_all["Scenario"].isin(dashboard_scenarios))
-                ].copy()
+        loc_data = df_all[df_all["Location"] == location]
 
-            if dashboard_data.empty:
-                st.warning(f"{EMOJI['warning']} No data available for {dashboard_location} and selected scenarios.")
-                continue
+        if loc_data.empty:
+            st.warning(f"{EMOJI['warning']} No data for {location}")
+            continue
 
-            # Include Historical data for baseline if needed (using cached hist_df)
-            if baseline_year < REFERENCE_YEAR and hist_label:
-                if hist_label not in dashboard_scenarios and hist_df is not None:
-                    hist_subset = hist_df[
-                        (hist_df["Location"] == dashboard_location) &
-                        (hist_df["Season"] == "Annual")
-                        ].copy()
-                    if not hist_subset.empty:
-                        dashboard_data = pd.concat([dashboard_data, hist_subset], ignore_index=True)
-
-            # Get pre-industrial baselines for this location (already calculated)
-            preindustrial_baselines = preindustrial_baselines_by_loc.get(dashboard_location, {})
-
-        # Display metrics for each scenario
         for scenario in dashboard_scenarios:
-            st.markdown("---")
             st.subheader(f"{EMOJI['globe']} {scenario}")
 
-            # Initialise PDF data structure
-            if scenario not in pdf_data:
-                pdf_data[scenario] = {}
-            if dashboard_location not in pdf_data[scenario]:
-                pdf_data[scenario][dashboard_location] = {}
+            cols = st.columns(4)
+            for i, (label, year, colour) in enumerate(horizons):
+                with cols[i]:
+                    st.markdown(
+                        f"<h3 style='text-align:center;color:{colour};margin:0;'>{year}</h3>"
+                        f"<p style='text-align:center;font-size:12px;font-weight:bold;margin-top:-5px;'>{label.upper()}</p>",
+                        unsafe_allow_html=True
+                    )
 
-            scenario_baseline_year = baseline_year
-            baseline_scenario = scenario
-            if baseline_year < REFERENCE_YEAR:
-                if hist_label:
-                    baseline_scenario = hist_label
-
-            # Time horizon header - original sizes
-            st.markdown(f"### {EMOJI['calendar']} Time Horizons")
-            col_ref, col_short, col_mid, col_long = st.columns(4)
-
-            with col_ref:
-                baseline_label = 'BASELINE' if baseline_year != REFERENCE_YEAR else 'REFERENCE'
-                st.markdown(f"<h2 style='text-align:center;color:#808080;margin:0;'>{scenario_baseline_year}</h2>",
-                            unsafe_allow_html=True)
-                st.markdown(f"<p style='text-align:center;font-weight:bold;margin-top:-10px;'>{baseline_label}</p>",
-                            unsafe_allow_html=True)
-            with col_short:
-                st.markdown(f"<h2 style='text-align:center;color:#3498DB;margin:0;'>{mid_start}</h2>",
-                            unsafe_allow_html=True)
-                st.markdown("<p style='text-align:center;font-weight:bold;margin-top:-10px;'>SHORT TERM</p>",
-                            unsafe_allow_html=True)
-            with col_mid:
-                st.markdown(f"<h2 style='text-align:center;color:#F39C12;margin:0;'>{long_start}</h2>",
-                            unsafe_allow_html=True)
-                st.markdown("<p style='text-align:center;font-weight:bold;margin-top:-10px;'>MEDIUM TERM</p>",
-                            unsafe_allow_html=True)
-            with col_long:
-                st.markdown(f"<h2 style='text-align:center;color:#E74C3C;margin:0;'>{horizon_end}</h2>",
-                            unsafe_allow_html=True)
-                st.markdown("<p style='text-align:center;font-weight:bold;margin-top:-10px;'>LONG TERM</p>",
-                            unsafe_allow_html=True)
-
-            # Display metrics by category
             for category, metrics in DASHBOARD_METRICS.items():
-                st.markdown(f"<h3 style='margin:12px 0 8px 0;'>{category}</h3>", unsafe_allow_html=True)
-
-                # Initialise PDF category
-                if category not in pdf_data[scenario][dashboard_location]:
-                    pdf_data[scenario][dashboard_location][category] = []
+                st.markdown(f"**{category}**")
 
                 for metric_type, metric_name, unit, icon, key in metrics:
-                    actual_metric_name = find_best_metric_name(dashboard_data, metric_type, metric_name)
-                    display_name = actual_metric_name.replace(" (BC)",
-                                                              "") if "(BC)" in actual_metric_name else actual_metric_name
+                    actual_name = find_metric_name(loc_data, metric_type, metric_name)
+                    display_name = actual_name.replace(" (BC)", "")
 
-                    col_ref, col_short, col_mid, col_long = st.columns(4)
-
-                    # Get baseline value
-                    baseline_val = get_5year_average(
-                        dashboard_data, metric_type, actual_metric_name,
-                        baseline_scenario, scenario_baseline_year, dashboard_location
+                    short_term_val = get_value_at_year(
+                        loc_data, metric_type, actual_name, scenario, short_start, location
                     )
-
-                    # Calculate values for each horizon
-                    value_ref = baseline_val
-                    change_ref = 0.0 if value_ref is not None else None
-                    pi_change_ref = (value_ref - preindustrial_baselines.get((metric_type, actual_metric_name))) if (
-                            value_ref is not None and preindustrial_baselines.get(
-                        (metric_type, actual_metric_name)) is not None
-                    ) else None
-
-                    value_short = get_5year_average(
-                        dashboard_data, metric_type, actual_metric_name,
-                        scenario, mid_start, dashboard_location
-                    )
-                    change_short = (value_short - baseline_val) if (
-                            value_short is not None and baseline_val is not None) else None
-                    pi_change_short = (
-                            value_short - preindustrial_baselines.get((metric_type, actual_metric_name))) if (
-                            value_short is not None and preindustrial_baselines.get(
-                        (metric_type, actual_metric_name)) is not None
-                    ) else None
-
-                    value_mid = get_5year_average(
-                        dashboard_data, metric_type, actual_metric_name,
-                        scenario, long_start, dashboard_location
-                    )
-                    change_mid = (value_mid - baseline_val) if (
-                            value_mid is not None and baseline_val is not None) else None
-                    pi_change_mid = (value_mid - preindustrial_baselines.get((metric_type, actual_metric_name))) if (
-                            value_mid is not None and preindustrial_baselines.get(
-                        (metric_type, actual_metric_name)) is not None
-                    ) else None
-
-                    value_long = get_5year_average(
-                        dashboard_data, metric_type, actual_metric_name,
-                        scenario, horizon_end, dashboard_location
-                    )
-                    change_long = (value_long - baseline_val) if (
-                            value_long is not None and baseline_val is not None) else None
-                    pi_change_long = (value_long - preindustrial_baselines.get((metric_type, actual_metric_name))) if (
-                            value_long is not None and preindustrial_baselines.get(
-                        (metric_type, actual_metric_name)) is not None
-                    ) else None
 
                     is_inverse = should_use_inverse_delta(metric_type, metric_name)
 
-                    # Store for PDF
-                    pdf_data[scenario][dashboard_location][category].append({
-                        'name': display_name,
-                        'unit': unit,
-                        'values': {
-                            'baseline': value_ref,
-                            'short': change_short,
-                            'mid': change_mid,
-                            'long': change_long
-                        }
-                    })
+                    cols = st.columns(4)
 
-                    # Display compact cards
-                    with col_ref:
-                        html = format_compact_metric_card_html(
-                            display_name, change_ref, unit, value_ref, pi_change_ref, is_inverse
-                        )
-                        st.markdown(html, unsafe_allow_html=True)
+                    for i, (label, year, colour) in enumerate(horizons):
+                        with cols[i]:
+                            value = get_value_at_year(
+                                loc_data, metric_type, actual_name, scenario, year, location
+                            )
 
-                    with col_short:
-                        html = format_compact_metric_card_html(
-                            display_name, change_short, unit, value_short, pi_change_short, is_inverse
-                        )
-                        st.markdown(html, unsafe_allow_html=True)
+                            if value is not None and short_term_val is not None:
+                                change = value - short_term_val
+                            else:
+                                change = None
 
-                    with col_mid:
-                        html = format_compact_metric_card_html(
-                            display_name, change_mid, unit, value_mid, pi_change_mid, is_inverse
-                        )
-                        st.markdown(html, unsafe_allow_html=True)
+                            html = format_metric_card(display_name, value, change, unit, is_inverse)
+                            st.markdown(html, unsafe_allow_html=True)
 
-                    with col_long:
-                        html = format_compact_metric_card_html(
-                            display_name, change_long, unit, value_long, pi_change_long, is_inverse
-                        )
-                        st.markdown(html, unsafe_allow_html=True)
+                st.markdown("")
 
-                st.markdown("<div style='margin:8px 0;'></div>", unsafe_allow_html=True)
-
-    # PDF Export - single click download at bottom of dashboard
-    if pdf_data:  # Only show if we have data
-        # Use first location's baselines for PDF (simplified)
-        first_loc_baselines = preindustrial_baselines_by_loc.get(loc_sel[0], {}) if loc_sel else {}
-
-        pdf_bytes = generate_pdf_report(
-            pdf_data,
-            loc_sel,
-            baseline_year,
-            mid_start,
-            long_start,
-            horizon_end,
-            first_loc_baselines
-        )
-
-        if pdf_bytes:
-            st.markdown("---")
-            st.download_button(
-                label=f"{EMOJI['page']} Download PDF Report",
-                data=pdf_bytes,
-                file_name=f"climate_dashboard_{datetime.now().strftime('%Y%m%d_%H%M')}.pdf",
-                mime="application/pdf",
-                help="Download complete dashboard as PDF to your Downloads folder"
-            )
-        else:
-            st.error(f"{EMOJI['x_mark']} PDF generation failed. Install fpdf2: `pip install fpdf2`")
+    st.markdown("---")
+    st.caption(f"Data from {len(dashboard_scenarios)} scenario(s) across {len(loc_sel)} location(s). "
+               f"Horizons: Short ({short_start}), Medium ({mid_start}), Long ({long_start}), End ({horizon_end}).")

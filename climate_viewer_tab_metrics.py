@@ -2,19 +2,43 @@
 """
 Climate Viewer Metrics Tab
 ===========================
-Last Updated: 2025-11-26 17:15 AEST - Fixed smoothing edge effects (apply before year filter)
+climate_viewer_tab_metrics.py
+Last Updated: 2025-12-02 12:00 AEST - Fixed: tab is now display-only
+
+Bug Fixes Applied:
+- Removed duplicate smoothing (was applied here AND in main app)
+- Removed duplicate alignment (was always applied, ignoring toggle)
+- Tab now receives pre-processed data and only displays it
+- Mode-specific transformations (Baseline, Deltas) still handled here
+  as they depend on display settings, not data processing toggles
+
+Architecture:
+- Main app handles: BC toggle, Smooth toggle, Align toggle
+- This tab handles: Display mode (Values/Baseline/Deltas), filtering, visualisation
 """
 import pandas as pd
 import altair as alt
 from climate_viewer_constants import IDX_COLS_ANNUAL, IDX_COLS_SEASONAL, WARMING_TARGET, AMPLIFICATION_FACTOR, EMOJI
-from climate_viewer_data_operations import apply_deltas_vs_base, apply_baseline_from_start, apply_smoothing, \
-    align_smoothed_to_agcd
+from climate_viewer_data_operations import apply_deltas_vs_base, apply_baseline_from_start
 
 
 def render_metrics_tab(st, ns, loc_sel, scen_sel, type_sel, name_sel, season_sel, y0, y1,
-                       mode, smooth, smooth_win, show_15c_shading, show_horizon_shading,
+                       mode, smooth, smooth_win, show_global_thresholds, show_horizon_shading,
                        short_start, mid_start, long_start, horizon_end,
                        df_all, base_df, preindustrial_baseline, BASE_LABEL):
+    """
+    Render the Climate Metrics tab.
+
+    This is a DISPLAY-ONLY function. Data processing (BC, smoothing, alignment)
+    is handled by the main app before data is passed here.
+
+    This function handles:
+    - Content filtering (type, name, season, location)
+    - Display mode transformations (Baseline, Deltas)
+    - Year range filtering
+    - Chart rendering
+    - Data table display
+    """
     st.title(f"{EMOJI['thermometer']} Climate Metrics Viewer")
 
     col1, col2, col3, col4 = st.columns(4)
@@ -28,13 +52,14 @@ def render_metrics_tab(st, ns, loc_sel, scen_sel, type_sel, name_sel, season_sel
         st.metric(f"{EMOJI['graph']} Mode", mode.split("(")[0].strip())
 
     st.caption(
-        f"Locations: {', '.join(loc_sel)} - "
-        f"Scenarios: {', '.join(scen_sel)} - "
-        f"Type: {type_sel} - "
+        f"Locations: {', '.join(loc_sel)} | "
+        f"Scenarios: {', '.join(scen_sel)} | "
+        f"Type: {type_sel} | "
         f"Metrics: {', '.join(name_sel)}"
     )
 
-    # Filter by everything EXCEPT year range first (for smoothing to work correctly)
+    # Filter by content (type, name, season, location)
+    # Year range already applied by main app, but we re-filter for display modes
     content_mask = (
             df_all["Location"].isin(loc_sel) &
             df_all["Season"].isin(season_sel) &
@@ -46,6 +71,8 @@ def render_metrics_tab(st, ns, loc_sel, scen_sel, type_sel, name_sel, season_sel
     use_baseline = mode.startswith("Baseline")
     apply_delta = mode.startswith("Deltas")
 
+    # Apply display mode transformations
+    # Note: These are display transformations, not data processing
     if apply_delta:
         base_content_mask = (
                 base_df["Location"].isin(loc_sel) &
@@ -54,30 +81,13 @@ def render_metrics_tab(st, ns, loc_sel, scen_sel, type_sel, name_sel, season_sel
                 base_df["Name"].isin(name_sel)
         )
         base_filtered = base_df[base_content_mask].copy()
-
         view = apply_deltas_vs_base(view, base_filtered)
 
-        if smooth:
-            view = apply_smoothing(view, smooth_win)
-
-        # NOW apply year filter
-        view = view[view["Year"].between(y0, y1)]
-
     elif use_baseline:
-        if smooth:
-            view = apply_smoothing(view, smooth_win)
-
-        # NOW apply year filter (before baseline calculation)
-        view = view[view["Year"].between(y0, y1)]
         view = apply_baseline_from_start(view, baseline_year=y0)
-    else:
-        if smooth:
-            view = apply_smoothing(view, smooth_win)
-            # Re-align scenarios to AGCD after smoothing (smoothing shifts alignment)
-            view = align_smoothed_to_agcd(view, alignment_year=2014)
 
-        # NOW apply year filter
-        view = view[view["Year"].between(y0, y1)]
+    # Data is already filtered to year range by main app
+    # No additional year filtering needed here
 
     view = view.dropna(subset=["Value"])
 
@@ -95,38 +105,39 @@ def render_metrics_tab(st, ns, loc_sel, scen_sel, type_sel, name_sel, season_sel
     )
     idx_cols = IDX_COLS_SEASONAL if use_seasonal else IDX_COLS_ANNUAL
 
-    warming_reference = None
-    if type_sel == "Temp" and "Average" in name_sel and show_15c_shading:
+    # Calculate warming reference lines
+    warming_references = {}  # Dict[threshold -> Dict[location -> temp]]
+    DISPLAY_THRESHOLDS = [1.5, 2.0, 2.5]
+    if type_sel == "Temp" and "Average" in name_sel and show_global_thresholds:
         if preindustrial_baseline:
-            # When GLOBAL warming reaches target, regional warming is amplified
-            # Regional warming = Global warming x Amplification factor
-            # Regional temp at global target = Regional_baseline + (WARMING_TARGET x AMPLIFICATION_FACTOR)
-            REGIONAL_WARMING_AT_GLOBAL_TARGET = WARMING_TARGET * AMPLIFICATION_FACTOR  # = 1.724 deg C
+            for threshold in DISPLAY_THRESHOLDS:
+                # Regional warming = Global warming × Amplification factor
+                regional_warming_at_threshold = threshold * AMPLIFICATION_FACTOR
 
-            if use_baseline or apply_delta:
-                # In baseline/delta mode, calculate the reference relative to the display baseline
-                # Need to find what the baseline-adjusted value would be at the warming threshold
-                warming_reference = {}
-                for loc, preindustrial_temp in preindustrial_baseline.items():
-                    # Target absolute temperature
-                    target_absolute_temp = preindustrial_temp + REGIONAL_WARMING_AT_GLOBAL_TARGET
+                if use_baseline or apply_delta:
+                    # In baseline/delta mode, calculate relative to display baseline
+                    warming_references[threshold] = {}
+                    for loc, preindustrial_temp in preindustrial_baseline.items():
+                        target_absolute_temp = preindustrial_temp + regional_warming_at_threshold
 
-                    # Get the baseline value at start year for this location
-                    loc_data = df_all[
-                        (df_all["Location"] == loc) &
-                        (df_all["Type"] == "Temp") &
-                        (df_all["Name"] == "Average") &
-                        (df_all["Season"] == "Annual") &
-                        (df_all["Year"] == y0)
-                        ]
-                    if not loc_data.empty:
-                        baseline_temp = loc_data["Value"].mean()
-                        # Reference line in baseline mode = target - baseline
-                        warming_reference[loc] = target_absolute_temp - baseline_temp
-            else:
-                # Absolute mode - use absolute temperature values
-                warming_reference = {loc: temp + REGIONAL_WARMING_AT_GLOBAL_TARGET for loc, temp in
-                                     preindustrial_baseline.items()}
+                        loc_data = df_all[
+                            (df_all["Location"] == loc) &
+                            (df_all["Type"] == "Temp") &
+                            (df_all["Name"] == "Average") &
+                            (df_all["Season"] == "Annual") &
+                            (df_all["Year"] == y0)
+                            ]
+                        if not loc_data.empty:
+                            baseline_temp = loc_data["Value"].mean()
+                            warming_references[threshold][loc] = target_absolute_temp - baseline_temp
+                else:
+                    # Absolute mode - use absolute temperature values
+                    warming_references[threshold] = {
+                        loc: temp + regional_warming_at_threshold
+                        for loc, temp in preindustrial_baseline.items()
+                    }
+
+    # Summary statistics
     with st.expander(f"{EMOJI['chart']} Summary Statistics", expanded=False):
         summary = view.groupby(["Scenario", "Name"])["Value"].agg([
             ("Mean", "mean"),
@@ -134,10 +145,11 @@ def render_metrics_tab(st, ns, loc_sel, scen_sel, type_sel, name_sel, season_sel
             ("Max", "max"),
             ("Change", lambda x: x.max() - x.min())
         ]).round(2)
-        st.dataframe(summary, width="stretch")
+        st.dataframe(summary, use_container_width=True)
 
     st.subheader(f"{EMOJI['graph']} Visualisation")
 
+    # Render chart for each location
     for location in loc_sel:
         st.markdown(f"{EMOJI['pin']} {location}")
 
@@ -171,28 +183,31 @@ def render_metrics_tab(st, ns, loc_sel, scen_sel, type_sel, name_sel, season_sel
             )
             x_encoding = alt.X(
                 "X:N",
-                title="Year-",
+                title="Year-Season",
                 axis=alt.Axis(labelFontSize=12, titleFontSize=14, labelAngle=-45),
                 sort=list(plot_data["X"].unique())
             )
 
         selection = alt.selection_point(fields=["Metric", "Scenario"], bind="legend")
 
-        # Calculate y-axis domain including reference line if present
+        # Calculate y-axis domain including reference lines if present
         y_min = plot_data["Value"].min()
         y_max = plot_data["Value"].max()
 
-        if warming_reference and location in warming_reference:
-            reference_temp = warming_reference[location]
-            y_min = min(y_min, reference_temp)
-            y_max = max(y_max, reference_temp)
+        # Extend domain to include all threshold lines
+        for threshold, loc_temps in warming_references.items():
+            if location in loc_temps:
+                ref_temp = loc_temps[location]
+                y_min = min(y_min, ref_temp)
+                y_max = max(y_max, ref_temp)
 
         y_range = y_max - y_min
-        y_padding = y_range * 0.05
+        y_padding = y_range * 0.05 if y_range > 0 else 1
         y_domain = [y_min - y_padding, y_max + y_padding]
 
         chart_layers = []
 
+        # Time horizon shading
         if show_horizon_shading and idx_cols == IDX_COLS_ANNUAL:
             if short_start < mid_start and short_start >= y0 and mid_start <= y1:
                 short_rect = alt.Chart(pd.DataFrame({
@@ -227,6 +242,7 @@ def render_metrics_tab(st, ns, loc_sel, scen_sel, type_sel, name_sel, season_sel
                 )
                 chart_layers.append(long_rect)
 
+        # Main line chart
         chart = (
             alt.Chart(plot_data)
             .mark_line(point=True, strokeWidth=2.5)
@@ -271,23 +287,54 @@ def render_metrics_tab(st, ns, loc_sel, scen_sel, type_sel, name_sel, season_sel
 
         chart_layers.append(chart)
 
-        if warming_reference and location in warming_reference:
-            reference_temp = warming_reference[location]
-            # Create simple DataFrame with same Value field as main chart for scale sharing
-            ref_data = pd.DataFrame({"Value": [reference_temp]})
-            reference_line = (
-                alt.Chart(ref_data)
-                .mark_rule(color="red", strokeDash=[5, 5], strokeWidth=2)
-                .encode(
-                    y="Value:Q",
-                    tooltip=alt.value("1.5 deg C global warming target")
-                )
-            )
-            chart_layers.append(reference_line)
+        # Add threshold reference lines (1.5, 2.0, 2.5°C) with labels
+        threshold_colors = {1.5: "#E74C3C", 2.0: "#F39C12", 2.5: "#8E44AD"}  # Red, Orange, Purple
+        for threshold, loc_temps in warming_references.items():
+            if location in loc_temps:
+                ref_temp = loc_temps[location]
+                ref_data = pd.DataFrame({"Value": [ref_temp], "Year": [y1], "Label": [f"{threshold}°C"]})
 
-        combined_chart = alt.layer(*chart_layers).properties(height=450).interactive()
+                # Reference line
+                reference_line = (
+                    alt.Chart(ref_data)
+                    .mark_rule(color=threshold_colors.get(threshold, "red"), strokeDash=[5, 5], strokeWidth=2)
+                    .encode(
+                        y="Value:Q",
+                        tooltip=alt.value(f"{threshold}°C global warming threshold")
+                    )
+                )
+                chart_layers.append(reference_line)
+
+                # Label at right edge of chart
+                label = (
+                    alt.Chart(ref_data)
+                    .mark_text(
+                        align="left",
+                        baseline="middle",
+                        dx=5,
+                        fontSize=10,
+                        fontWeight="bold",
+                        color=threshold_colors.get(threshold, "red")
+                    )
+                    .encode(
+                        x=alt.X("Year:Q"),
+                        y=alt.Y("Value:Q"),
+                        text="Label:N"
+                    )
+                )
+                chart_layers.append(label)
+
+        combined_chart = alt.layer(*chart_layers).properties(
+            height=450
+        ).configure_view(
+            strokeWidth=0
+        ).configure_legend(
+            padding=20,
+            offset=30
+        )
         st.altair_chart(combined_chart, use_container_width=True)
 
+    # Data table
     st.subheader(f"{EMOJI['page']} Data Table")
 
     table_view = view.copy()
@@ -307,7 +354,7 @@ def render_metrics_tab(st, ns, loc_sel, scen_sel, type_sel, name_sel, season_sel
             aggfunc="first"
         ).sort_index()
 
-    st.dataframe(table, width="stretch", height=400)
+    st.dataframe(table, use_container_width=True, height=400)
 
     csv = table.to_csv()
     st.download_button(

@@ -1,0 +1,110 @@
+{
+  "sidebar": {
+    "locations": {
+      "help": "Select one or more locations to analyse. Each location represents a specific geographic point with extracted climate data."
+    },
+    "scenarios": {
+      "general_help": "Climate scenarios represent different possible futures based on socioeconomic pathways and greenhouse gas emissions.",
+      "agcd": "AGCD (Australian Gridded Climate Data): Observational data from Bureau of Meteorology weather stations. This is real historical climate data, not model output.",
+      "historical": "Historical: CMIP6 climate model simulation of past climate (typically 1850-2014). Used to validate model performance against observations.",
+      "ssp1-26": "SSP1-26 (Sustainability - Taking the Green Road): Low challenges to mitigation and adaptation. The world shifts gradually toward a more sustainable path, emphasising inclusive development. CO₂ emissions decline to net zero around 2075. Global warming likely limited to 1.8°C by 2100.",
+      "ssp2-45": "SSP2-45 (Middle of the Road): Medium challenges to mitigation and adaptation. Social, economic and technological trends do not shift markedly from historical patterns. CO₂ emissions remain around current levels before declining mid-century. Global warming likely around 2.7°C by 2100.",
+      "ssp3-70": "SSP3-70 (Regional Rivalry - A Rocky Road): High challenges to mitigation and adaptation. Resurgent nationalism, concerns about competitiveness and security lead to regional blocs. CO₂ emissions double by 2100. Global warming likely around 3.6°C by 2100.",
+      "ssp5-85": "SSP5-85 (Fossil-fuelled Development - Taking the Highway): High challenges for mitigation, low challenges for adaptation. Rapid technological progress and development of human capital with economy and lifestyles based on abundant fossil fuel use. CO₂ emissions triple by 2075. Global warming likely around 4.4°C by 2100."
+    },
+    "display_options": {
+      "display_mode": {
+        "help": "Choose how to display the data values.",
+        "values": "Absolute Values: Show actual measured or modelled values (e.g. temperature in °C, rainfall in mm).",
+        "baseline": "Baseline (start year): Show change relative to the first year in the selected range. Useful for seeing trends over time.",
+        "deltas": "Deltas vs baseline: Show difference between each scenario and the baseline scenario. Useful for comparing how scenarios diverge."
+      },
+      "smooth_values": "Apply rolling average smoothing to reduce year-to-year variability and reveal long-term trends more clearly. Useful for noisy metrics like rainfall.",
+      "smoothing_window": "Number of years to include in the rolling average. Larger windows create smoother curves but may hide short-term variations. Odd numbers (e.g. 9) keep the smoothed value centred on the middle year.",
+      "table_interval": "Control how many years to show in the data table. Larger intervals reduce table size for long time periods.",
+      "15c_shading": "Display a reference line showing when regional temperature reaches the level corresponding to 1.5°C global warming above pre-industrial. Regional warming is amplified (~1.15× global warming for this location).",
+      "horizon_shading": "Shade the chart background to show three future time horizons: Short-term (2021-2040), Mid-term (2041-2060), and Long-term (2061-2080). Helps visualise when changes are expected to occur."
+    },
+    "year_range": {
+      "help": "Select the time period to analyse. Historical data typically covers 1850-2014, while future scenarios extend to 2100.",
+      "start_year": "First year to include in analysis.",
+      "end_year": "Last year to include in analysis."
+    },
+    "time_horizons": {
+      "help": "Define custom time periods for analysis. These horizons appear in the Dashboard and can be highlighted on charts.",
+      "short_term": "Near-term period, typically 2021-2040 (IPCC AR6 definition).",
+      "mid_term": "Mid-century period, typically 2041-2060 (IPCC AR6 definition).",
+      "long_term": "End-of-century period, typically 2061-2080 (IPCC AR6 definition).",
+      "planning_horizon": "Final year for long-term planning or infrastructure design (e.g. 2100)."
+    },
+    "metric_type": {
+      "help": "Select the climate variable category to analyse.",
+      "temp": "Temperature: Daily average (tas), maximum (tasmax), heat thresholds, and extreme temperature metrics.",
+      "rain": "Rainfall/Precipitation: Daily totals, seasonal accumulations, wet day frequencies, dry spells, and extreme rainfall events.",
+      "wind": "Wind Speed: Daily average wind speed, extreme wind events, and wind percentiles.",
+      "humidity": "Humidity: Relative humidity (RH) and vapour pressure deficit (VPD). Important for heat stress, fire danger, and plant water stress."
+    },
+    "metric_names": {
+      "help": "Select specific metrics within the chosen variable type. Multiple metrics can be compared simultaneously.",
+      "temp": {
+        "average": "Average: Mean daily temperature (tas). Key indicator of overall warming trend.",
+        "max_day": "Max Day: Highest daily maximum temperature (tasmax) in the period. Indicates extreme heat events.",
+        "avg_max": "Avg Max: Average of daily maximum temperatures. Important for daytime heat exposure.",
+        "5day_avg_max": "5-Day Avg Max: Highest 5-day average of maximum temperatures. Indicates sustained heatwave conditions.",
+        "days_37c": "Days ≥37°C ≥3h est: Estimated number of days where temperature exceeds 37°C for at least 3 hours. Heat stress threshold for humans and agriculture.",
+        "days_40c": "Days ≥40°C ≥3h est: Estimated number of days where temperature exceeds 40°C for at least 3 hours. Extreme heat threshold with significant health and infrastructure impacts."
+      },
+      "rain": {
+        "total": "Total: Sum of daily precipitation (raw model output). Annual totals show overall water availability; seasonal totals show monsoon/dry season patterns. For SSP scenarios, also see 'Total (BC)' for bias-corrected values.",
+        "total_bc": "Total (BC): Bias-corrected precipitation. Correction factors calculated from AGCD vs Historical comparison (1990-2014). Accounts for systematic model underestimation during wet seasons (+44% DJF) and overestimation during dry seasons (-13% JJA/MAM). Only available for SSP scenarios. BC = Bias Corrected.",
+        "max_day": "Max Day: Highest daily rainfall in the period. Indicates extreme rainfall/flood potential. For SSP scenarios, 'Max Day (BC)' shows bias-corrected values.",
+        "min_day": "Min Day: Lowest daily rainfall (typically 0 mm). For SSP scenarios, 'Min Day (BC)' shows bias-corrected values.",
+        "max_5day": "Max 5-Day: Highest 5-day cumulative rainfall. Important for flood risk and soil saturation. For SSP scenarios, 'Max 5-Day (BC)' shows bias-corrected values.",
+        "min_5day": "Min 5-Day: Lowest 5-day cumulative rainfall. Indicates dry spell intensity. For SSP scenarios, 'Min 5-Day (BC)' shows bias-corrected values.",
+        "r10mm": "R10mm: Number of days with rainfall ≥10 mm. Moderate rainfall days. For SSP scenarios, 'R10mm (BC)' shows bias-corrected values.",
+        "r20mm": "R20mm: Number of days with rainfall ≥20 mm. Heavy rainfall days. For SSP scenarios, 'R20mm (BC)' shows bias-corrected values.",
+        "cdd": "CDD: Consecutive Dry Days - longest sequence of days with rainfall <1 mm. Key drought indicator. For SSP scenarios, 'CDD (BC)' shows bias-corrected values."
+      },
+      "wind": {
+        "average": "Average: Mean daily wind speed. Baseline wind climate.",
+        "max_day": "Max Day: Highest daily wind speed. Indicates extreme wind events.",
+        "95th_percentile": "95th Percentile: Wind speed exceeded on only 5% of days. Useful for structural design and wind energy assessment."
+      },
+      "humidity": {
+        "average_rh": "Average RH: Mean relative humidity (%). High RH increases heat stress and reduces evaporative cooling.",
+        "average_vpd": "Average VPD: Mean vapour pressure deficit (kPa). High VPD indicates dry air and increased plant water stress. Critical for agriculture and fire danger."
+      }
+    },
+    "seasons": {
+      "help": "Select seasons to analyse. Southern Hemisphere seasons are defined astronomically.",
+      "annual": "Annual: Full calendar year (Jan-Dec). Shows overall trends without seasonal breakdown.",
+      "djf": "DJF: Summer (December, January, February). Wet season for northern Australia; typically warmest period.",
+      "mam": "MAM: Autumn (March, April, May). Transition to dry season; moderate temperatures.",
+      "jja": "JJA: Winter (June, July, August). Dry season for northern Australia; typically coolest period.",
+      "son": "SON: Spring (September, October, November). Transition to wet season; temperatures rising."
+    }
+  },
+  "dashboard": {
+    "help": "Summary view comparing selected scenarios across multiple metrics and time horizons. Useful for identifying which scenarios show greatest changes and when those changes occur.",
+    "metric_type_selector": "Choose which climate variable to display in the heatmap matrix.",
+    "horizon_columns": "Each column represents a different time period. Colours show the magnitude of change relative to the baseline period."
+  },
+  "global_tab": {
+    "help": "Analyse the timing and impacts of reaching 1.5°C global warming above pre-industrial levels. This threshold is a key target in the Paris Agreement. Regional warming is typically amplified relative to global mean warming.",
+    "warming_year": "Shows when each scenario is projected to cross the 1.5°C global warming threshold.",
+    "regional_impact": "Shows the regional temperature at the time of reaching 1.5°C global warming. Regional warming is amplified by a factor of ~1.15 for this location.",
+    "exceedance_years": "Number of years where global temperature exceeds 1.5°C above pre-industrial. Higher emissions scenarios exceed the threshold earlier and for longer."
+  },
+  "user_guide": {
+    "help": "Comprehensive scientific documentation covering: data sources, climate scenarios, metrics definitions, uncertainty quantification, bias correction methodology, and interpretation guidance."
+  },
+  "general": {
+    "scenario_naming": {
+      "ssp": "SSP: Shared Socioeconomic Pathway - describes different socioeconomic development trends.",
+      "numbers": "First number (1-5): Socioeconomic pathway. Second number (26-85): Approximate radiative forcing in 2100 (W/m²), which relates to warming level."
+    },
+    "bias_correction_note": "Bias correction is applied during metrics generation. For SSP scenarios, both raw and bias-corrected versions of all rain metrics are available. Look for metrics with '(BC)' suffix (e.g. 'Total (BC)', 'Max Day (BC)') to view bias-corrected data. Correction factors are calculated from AGCD (observations) vs Historical (model) comparison during 1990-2014.",
+    "data_quality": "All data has been quality-controlled and validated. Missing values are not permitted. Climate model data is from CMIP6 (Coupled Model Intercomparison Project Phase 6).",
+    "citation": "Data: CMIP6 ACCESS-CM2 (CSIRO/BoM), AGCD (BoM). Analysis: Climate Metrics Viewer v2.0. Always verify data and consult with climate scientists for decision-making."
+  }
+}

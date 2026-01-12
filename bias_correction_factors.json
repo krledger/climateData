@@ -1,0 +1,4660 @@
+{
+  "metadata": {
+    "created": "2025-11-28T10:00:13.894830",
+    "methodology": "Decade-based bias correction with trend analysis",
+    "trend_p_threshold": 0.05,
+    "extrapolation": {
+      "enabled_for": [
+        "Temp"
+      ],
+      "target_period": "1850-1900"
+    },
+    "validation_periods": {
+      "Humidity": "1970-2014",
+      "Rain": "1900-2014",
+      "Temp": "1910-2014",
+      "VPD": "1970-2014"
+    },
+    "total_corrections": 156
+  },
+  "trend_analysis": {
+    "Australia_DJF_Humidity_Average": {
+      "significant": false,
+      "slope_per_decade": 0.491732,
+      "p_value": 0.2807,
+      "n_decades": 5
+    },
+    "Australia_DJF_Rain_CDD": {
+      "significant": false,
+      "slope_per_decade": -0.05024,
+      "p_value": 0.1016,
+      "n_decades": 12
+    },
+    "Australia_DJF_Rain_Max_5-Day": {
+      "significant": true,
+      "slope_per_decade": 0.014625,
+      "p_value": 0.0351,
+      "n_decades": 12
+    },
+    "Australia_DJF_Rain_Max_Day": {
+      "significant": false,
+      "slope_per_decade": 0.012865,
+      "p_value": 0.0618,
+      "n_decades": 12
+    },
+    "Australia_DJF_Rain_Min_5-Day": {
+      "significant": false,
+      "slope_per_decade": 0.018287,
+      "p_value": 0.3713,
+      "n_decades": 12
+    },
+    "Australia_DJF_Rain_Min_Day": {
+      "significant": false,
+      "slope_per_decade": 0.03316,
+      "p_value": 0.1165,
+      "n_decades": 12
+    },
+    "Australia_DJF_Rain_R10mm": {
+      "significant": false,
+      "slope_per_decade": 0.0,
+      "p_value": NaN,
+      "n_decades": 12
+    },
+    "Australia_DJF_Rain_Total": {
+      "significant": true,
+      "slope_per_decade": 0.018834,
+      "p_value": 0.023,
+      "n_decades": 12
+    },
+    "Australia_DJF_Temp_5-Day_Avg_Max": {
+      "significant": true,
+      "slope_per_decade": 0.111698,
+      "p_value": 0.0197,
+      "n_decades": 11
+    },
+    "Australia_DJF_Temp_5-Day_Avg_Min": {
+      "significant": false,
+      "slope_per_decade": -0.006623,
+      "p_value": 0.8847,
+      "n_decades": 11
+    },
+    "Australia_DJF_Temp_Average": {
+      "significant": false,
+      "slope_per_decade": 0.025952,
+      "p_value": 0.3507,
+      "n_decades": 11
+    },
+    "Australia_DJF_Temp_Avg_Max": {
+      "significant": false,
+      "slope_per_decade": 0.032872,
+      "p_value": 0.2923,
+      "n_decades": 11
+    },
+    "Australia_DJF_Temp_Avg_Min": {
+      "significant": false,
+      "slope_per_decade": 0.01256,
+      "p_value": 0.6083,
+      "n_decades": 11
+    },
+    "Australia_DJF_Temp_Max_Day": {
+      "significant": true,
+      "slope_per_decade": 0.099932,
+      "p_value": 0.0203,
+      "n_decades": 11
+    },
+    "Australia_DJF_Temp_Min_Day": {
+      "significant": false,
+      "slope_per_decade": 0.007581,
+      "p_value": 0.8947,
+      "n_decades": 11
+    },
+    "Australia_DJF_VPD_Average": {
+      "significant": false,
+      "slope_per_decade": -0.033981,
+      "p_value": 0.1695,
+      "n_decades": 5
+    },
+    "Australia_MAM_Humidity_Average": {
+      "significant": false,
+      "slope_per_decade": 0.741018,
+      "p_value": 0.2995,
+      "n_decades": 5
+    },
+    "Australia_MAM_Rain_CDD": {
+      "significant": false,
+      "slope_per_decade": -0.006343,
+      "p_value": 0.7545,
+      "n_decades": 12
+    },
+    "Australia_MAM_Rain_Max_5-Day": {
+      "significant": true,
+      "slope_per_decade": 0.027989,
+      "p_value": 0.0057,
+      "n_decades": 12
+    },
+    "Australia_MAM_Rain_Max_Day": {
+      "significant": true,
+      "slope_per_decade": 0.018206,
+      "p_value": 0.0172,
+      "n_decades": 12
+    },
+    "Australia_MAM_Rain_Min_5-Day": {
+      "significant": false,
+      "slope_per_decade": 0.018968,
+      "p_value": 0.5704,
+      "n_decades": 12
+    },
+    "Australia_MAM_Rain_Min_Day": {
+      "significant": false,
+      "slope_per_decade": 0.022351,
+      "p_value": 0.5572,
+      "n_decades": 12
+    },
+    "Australia_MAM_Rain_R10mm": {
+      "significant": false,
+      "slope_per_decade": 0.0,
+      "p_value": 1.0,
+      "n_decades": 8
+    },
+    "Australia_MAM_Rain_Total": {
+      "significant": true,
+      "slope_per_decade": 0.02548,
+      "p_value": 0.0045,
+      "n_decades": 12
+    },
+    "Australia_MAM_Temp_5-Day_Avg_Max": {
+      "significant": false,
+      "slope_per_decade": -0.074232,
+      "p_value": 0.2642,
+      "n_decades": 11
+    },
+    "Australia_MAM_Temp_5-Day_Avg_Min": {
+      "significant": false,
+      "slope_per_decade": -0.071937,
+      "p_value": 0.2869,
+      "n_decades": 11
+    },
+    "Australia_MAM_Temp_Average": {
+      "significant": false,
+      "slope_per_decade": -0.013225,
+      "p_value": 0.6839,
+      "n_decades": 11
+    },
+    "Australia_MAM_Temp_Avg_Max": {
+      "significant": false,
+      "slope_per_decade": -0.015491,
+      "p_value": 0.698,
+      "n_decades": 11
+    },
+    "Australia_MAM_Temp_Avg_Min": {
+      "significant": false,
+      "slope_per_decade": -0.011597,
+      "p_value": 0.6356,
+      "n_decades": 11
+    },
+    "Australia_MAM_Temp_Max_Day": {
+      "significant": false,
+      "slope_per_decade": -0.024851,
+      "p_value": 0.6865,
+      "n_decades": 11
+    },
+    "Australia_MAM_Temp_Min_Day": {
+      "significant": false,
+      "slope_per_decade": -0.068619,
+      "p_value": 0.3168,
+      "n_decades": 11
+    },
+    "Australia_JJA_Humidity_Average": {
+      "significant": false,
+      "slope_per_decade": -0.409177,
+      "p_value": 0.1651,
+      "n_decades": 5
+    },
+    "Australia_JJA_Rain_CDD": {
+      "significant": false,
+      "slope_per_decade": -0.029205,
+      "p_value": 0.3914,
+      "n_decades": 12
+    },
+    "Australia_JJA_Rain_Max_5-Day": {
+      "significant": false,
+      "slope_per_decade": -0.003804,
+      "p_value": 0.7215,
+      "n_decades": 12
+    },
+    "Australia_JJA_Rain_Max_Day": {
+      "significant": false,
+      "slope_per_decade": 0.002095,
+      "p_value": 0.8488,
+      "n_decades": 12
+    },
+    "Australia_JJA_Rain_Min_5-Day": {
+      "significant": false,
+      "slope_per_decade": 0.022116,
+      "p_value": 0.4916,
+      "n_decades": 12
+    },
+    "Australia_JJA_Rain_Min_Day": {
+      "significant": false,
+      "slope_per_decade": -0.014922,
+      "p_value": 0.696,
+      "n_decades": 12
+    },
+    "Australia_JJA_Rain_Total": {
+      "significant": false,
+      "slope_per_decade": 0.001281,
+      "p_value": 0.9432,
+      "n_decades": 12
+    },
+    "Australia_JJA_Temp_5-Day_Avg_Max": {
+      "significant": false,
+      "slope_per_decade": 0.079668,
+      "p_value": 0.1167,
+      "n_decades": 11
+    },
+    "Australia_JJA_Temp_5-Day_Avg_Min": {
+      "significant": false,
+      "slope_per_decade": -0.031756,
+      "p_value": 0.2866,
+      "n_decades": 11
+    },
+    "Australia_JJA_Temp_Average": {
+      "significant": false,
+      "slope_per_decade": -0.000742,
+      "p_value": 0.975,
+      "n_decades": 11
+    },
+    "Australia_JJA_Temp_Avg_Max": {
+      "significant": false,
+      "slope_per_decade": 0.03635,
+      "p_value": 0.3257,
+      "n_decades": 11
+    },
+    "Australia_JJA_Temp_Avg_Min": {
+      "significant": false,
+      "slope_per_decade": -0.03845,
+      "p_value": 0.0514,
+      "n_decades": 11
+    },
+    "Australia_JJA_Temp_Max_Day": {
+      "significant": false,
+      "slope_per_decade": 0.096232,
+      "p_value": 0.0698,
+      "n_decades": 11
+    },
+    "Australia_JJA_Temp_Min_Day": {
+      "significant": false,
+      "slope_per_decade": -0.037771,
+      "p_value": 0.2719,
+      "n_decades": 11
+    },
+    "Australia_JJA_VPD_Average": {
+      "significant": false,
+      "slope_per_decade": 0.011173,
+      "p_value": 0.0625,
+      "n_decades": 5
+    },
+    "Australia_SON_Humidity_Average": {
+      "significant": false,
+      "slope_per_decade": 0.409104,
+      "p_value": 0.2493,
+      "n_decades": 5
+    },
+    "Australia_SON_Rain_CDD": {
+      "significant": false,
+      "slope_per_decade": 0.006016,
+      "p_value": 0.6762,
+      "n_decades": 12
+    },
+    "Australia_SON_Rain_Max_5-Day": {
+      "significant": true,
+      "slope_per_decade": 0.01339,
+      "p_value": 0.0404,
+      "n_decades": 12
+    },
+    "Australia_SON_Rain_Max_Day": {
+      "significant": true,
+      "slope_per_decade": 0.01071,
+      "p_value": 0.042,
+      "n_decades": 12
+    },
+    "Australia_SON_Rain_Min_5-Day": {
+      "significant": false,
+      "slope_per_decade": -0.052134,
+      "p_value": 0.3477,
+      "n_decades": 12
+    },
+    "Australia_SON_Rain_Min_Day": {
+      "significant": false,
+      "slope_per_decade": -0.061889,
+      "p_value": 0.2795,
+      "n_decades": 12
+    },
+    "Australia_SON_Rain_Total": {
+      "significant": false,
+      "slope_per_decade": 0.010226,
+      "p_value": 0.3143,
+      "n_decades": 12
+    },
+    "Australia_SON_Temp_5-Day_Avg_Max": {
+      "significant": false,
+      "slope_per_decade": -0.006923,
+      "p_value": 0.8901,
+      "n_decades": 11
+    },
+    "Australia_SON_Temp_5-Day_Avg_Min": {
+      "significant": false,
+      "slope_per_decade": -0.023815,
+      "p_value": 0.526,
+      "n_decades": 11
+    },
+    "Australia_SON_Temp_Average": {
+      "significant": false,
+      "slope_per_decade": 0.006531,
+      "p_value": 0.8138,
+      "n_decades": 11
+    },
+    "Australia_SON_Temp_Avg_Max": {
+      "significant": false,
+      "slope_per_decade": 0.024236,
+      "p_value": 0.4314,
+      "n_decades": 11
+    },
+    "Australia_SON_Temp_Avg_Min": {
+      "significant": false,
+      "slope_per_decade": -0.018041,
+      "p_value": 0.4928,
+      "n_decades": 11
+    },
+    "Australia_SON_Temp_Max_Day": {
+      "significant": false,
+      "slope_per_decade": -0.005075,
+      "p_value": 0.9179,
+      "n_decades": 11
+    },
+    "Australia_SON_Temp_Min_Day": {
+      "significant": false,
+      "slope_per_decade": -0.01173,
+      "p_value": 0.7659,
+      "n_decades": 11
+    },
+    "Australia_Annual_Humidity_Average": {
+      "significant": false,
+      "slope_per_decade": 0.333612,
+      "p_value": 0.3729,
+      "n_decades": 5
+    },
+    "Australia_Annual_Rain_CDD": {
+      "significant": false,
+      "slope_per_decade": -0.019166,
+      "p_value": 0.4406,
+      "n_decades": 12
+    },
+    "Australia_Annual_Rain_Max_5-Day": {
+      "significant": true,
+      "slope_per_decade": 0.01557,
+      "p_value": 0.0042,
+      "n_decades": 12
+    },
+    "Australia_Annual_Rain_Max_Day": {
+      "significant": true,
+      "slope_per_decade": 0.01169,
+      "p_value": 0.0232,
+      "n_decades": 12
+    },
+    "Australia_Annual_Rain_Min_5-Day": {
+      "significant": false,
+      "slope_per_decade": -0.040163,
+      "p_value": 0.3715,
+      "n_decades": 12
+    },
+    "Australia_Annual_Rain_Min_Day": {
+      "significant": false,
+      "slope_per_decade": -0.033445,
+      "p_value": 0.4733,
+      "n_decades": 12
+    },
+    "Australia_Annual_Rain_R10mm": {
+      "significant": false,
+      "slope_per_decade": -0.000874,
+      "p_value": 0.8928,
+      "n_decades": 12
+    },
+    "Australia_Annual_Rain_Total": {
+      "significant": true,
+      "slope_per_decade": 0.016844,
+      "p_value": 0.0283,
+      "n_decades": 12
+    },
+    "Australia_Annual_Temp_5-Day_Avg_Max": {
+      "significant": false,
+      "slope_per_decade": 0.079554,
+      "p_value": 0.0699,
+      "n_decades": 11
+    },
+    "Australia_Annual_Temp_5-Day_Avg_Min": {
+      "significant": false,
+      "slope_per_decade": -0.031756,
+      "p_value": 0.2866,
+      "n_decades": 11
+    },
+    "Australia_Annual_Temp_Average": {
+      "significant": false,
+      "slope_per_decade": 0.004838,
+      "p_value": 0.8322,
+      "n_decades": 11
+    },
+    "Australia_Annual_Temp_Avg_Max": {
+      "significant": false,
+      "slope_per_decade": 0.01947,
+      "p_value": 0.4939,
+      "n_decades": 11
+    },
+    "Australia_Annual_Temp_Avg_Min": {
+      "significant": false,
+      "slope_per_decade": -0.013438,
+      "p_value": 0.4531,
+      "n_decades": 11
+    },
+    "Australia_Annual_Temp_Max_Day": {
+      "significant": false,
+      "slope_per_decade": 0.072476,
+      "p_value": 0.1216,
+      "n_decades": 11
+    },
+    "Australia_Annual_Temp_Min_Day": {
+      "significant": false,
+      "slope_per_decade": -0.037771,
+      "p_value": 0.2719,
+      "n_decades": 11
+    },
+    "Ravenswood_DJF_Humidity_Average": {
+      "significant": false,
+      "slope_per_decade": 0.055399,
+      "p_value": 0.9372,
+      "n_decades": 5
+    },
+    "Ravenswood_DJF_Rain_CDD": {
+      "significant": false,
+      "slope_per_decade": 0.011856,
+      "p_value": 0.457,
+      "n_decades": 12
+    },
+    "Ravenswood_DJF_Rain_Max_5-Day": {
+      "significant": false,
+      "slope_per_decade": -0.059252,
+      "p_value": 0.1614,
+      "n_decades": 12
+    },
+    "Ravenswood_DJF_Rain_Max_Day": {
+      "significant": false,
+      "slope_per_decade": -0.051073,
+      "p_value": 0.3469,
+      "n_decades": 12
+    },
+    "Ravenswood_DJF_Rain_Min_5-Day": {
+      "significant": false,
+      "slope_per_decade": 0.12678,
+      "p_value": 0.1015,
+      "n_decades": 12
+    },
+    "Ravenswood_DJF_Rain_Min_Day": {
+      "significant": false,
+      "slope_per_decade": 0.0,
+      "p_value": NaN,
+      "n_decades": 12
+    },
+    "Ravenswood_DJF_Rain_R10mm": {
+      "significant": false,
+      "slope_per_decade": -0.078924,
+      "p_value": 0.3023,
+      "n_decades": 12
+    },
+    "Ravenswood_DJF_Rain_R20mm": {
+      "significant": false,
+      "slope_per_decade": -0.10339,
+      "p_value": 0.3694,
+      "n_decades": 12
+    },
+    "Ravenswood_DJF_Rain_Total": {
+      "significant": false,
+      "slope_per_decade": -0.06006,
+      "p_value": 0.2602,
+      "n_decades": 12
+    },
+    "Ravenswood_DJF_Temp_5-Day_Avg_Max": {
+      "significant": false,
+      "slope_per_decade": -0.058155,
+      "p_value": 0.5171,
+      "n_decades": 11
+    },
+    "Ravenswood_DJF_Temp_5-Day_Avg_Min": {
+      "significant": false,
+      "slope_per_decade": -0.030443,
+      "p_value": 0.2687,
+      "n_decades": 11
+    },
+    "Ravenswood_DJF_Temp_Average": {
+      "significant": false,
+      "slope_per_decade": 0.044418,
+      "p_value": 0.3308,
+      "n_decades": 11
+    },
+    "Ravenswood_DJF_Temp_Avg_Max": {
+      "significant": false,
+      "slope_per_decade": 0.086791,
+      "p_value": 0.1754,
+      "n_decades": 11
+    },
+    "Ravenswood_DJF_Temp_Avg_Min": {
+      "significant": false,
+      "slope_per_decade": -0.002274,
+      "p_value": 0.9501,
+      "n_decades": 11
+    },
+    "Ravenswood_DJF_Temp_Max_Day": {
+      "significant": false,
+      "slope_per_decade": -0.072908,
+      "p_value": 0.5534,
+      "n_decades": 11
+    },
+    "Ravenswood_DJF_Temp_Min_Day": {
+      "significant": false,
+      "slope_per_decade": -0.012773,
+      "p_value": 0.8051,
+      "n_decades": 11
+    },
+    "Ravenswood_MAM_Humidity_Average": {
+      "significant": false,
+      "slope_per_decade": 1.011207,
+      "p_value": 0.186,
+      "n_decades": 5
+    },
+    "Ravenswood_MAM_Rain_CDD": {
+      "significant": false,
+      "slope_per_decade": -0.056254,
+      "p_value": 0.131,
+      "n_decades": 12
+    },
+    "Ravenswood_MAM_Rain_Max_5-Day": {
+      "significant": false,
+      "slope_per_decade": 0.008207,
+      "p_value": 0.8354,
+      "n_decades": 12
+    },
+    "Ravenswood_MAM_Rain_Max_Day": {
+      "significant": false,
+      "slope_per_decade": 0.01868,
+      "p_value": 0.6535,
+      "n_decades": 12
+    },
+    "Ravenswood_MAM_Rain_Min_5-Day": {
+      "significant": false,
+      "slope_per_decade": 0.002439,
+      "p_value": 0.2923,
+      "n_decades": 12
+    },
+    "Ravenswood_MAM_Rain_Min_Day": {
+      "significant": false,
+      "slope_per_decade": 0.0,
+      "p_value": NaN,
+      "n_decades": 12
+    },
+    "Ravenswood_MAM_Rain_R10mm": {
+      "significant": false,
+      "slope_per_decade": 0.02498,
+      "p_value": 0.3731,
+      "n_decades": 12
+    },
+    "Ravenswood_MAM_Rain_R20mm": {
+      "significant": false,
+      "slope_per_decade": -0.005617,
+      "p_value": 0.8839,
+      "n_decades": 12
+    },
+    "Ravenswood_MAM_Rain_Total": {
+      "significant": false,
+      "slope_per_decade": 0.01187,
+      "p_value": 0.6083,
+      "n_decades": 12
+    },
+    "Ravenswood_MAM_Temp_5-Day_Avg_Max": {
+      "significant": false,
+      "slope_per_decade": -0.029935,
+      "p_value": 0.717,
+      "n_decades": 11
+    },
+    "Ravenswood_MAM_Temp_5-Day_Avg_Min": {
+      "significant": false,
+      "slope_per_decade": -0.074102,
+      "p_value": 0.6697,
+      "n_decades": 11
+    },
+    "Ravenswood_MAM_Temp_Average": {
+      "significant": false,
+      "slope_per_decade": -0.020081,
+      "p_value": 0.6634,
+      "n_decades": 11
+    },
+    "Ravenswood_MAM_Temp_Avg_Max": {
+      "significant": false,
+      "slope_per_decade": -0.028201,
+      "p_value": 0.621,
+      "n_decades": 11
+    },
+    "Ravenswood_MAM_Temp_Avg_Min": {
+      "significant": false,
+      "slope_per_decade": -0.012748,
+      "p_value": 0.7685,
+      "n_decades": 11
+    },
+    "Ravenswood_MAM_Temp_Max_Day": {
+      "significant": false,
+      "slope_per_decade": -0.140329,
+      "p_value": 0.1309,
+      "n_decades": 11
+    },
+    "Ravenswood_MAM_Temp_Min_Day": {
+      "significant": false,
+      "slope_per_decade": -0.159321,
+      "p_value": 0.437,
+      "n_decades": 11
+    },
+    "Ravenswood_JJA_Humidity_Average": {
+      "significant": false,
+      "slope_per_decade": 0.708496,
+      "p_value": 0.062,
+      "n_decades": 5
+    },
+    "Ravenswood_JJA_Rain_CDD": {
+      "significant": true,
+      "slope_per_decade": -0.074807,
+      "p_value": 0.0163,
+      "n_decades": 12
+    },
+    "Ravenswood_JJA_Rain_Max_5-Day": {
+      "significant": false,
+      "slope_per_decade": 0.004046,
+      "p_value": 0.9065,
+      "n_decades": 12
+    },
+    "Ravenswood_JJA_Rain_Max_Day": {
+      "significant": false,
+      "slope_per_decade": -0.012051,
+      "p_value": 0.7652,
+      "n_decades": 12
+    },
+    "Ravenswood_JJA_Rain_Min_5-Day": {
+      "significant": false,
+      "slope_per_decade": 0.000334,
+      "p_value": 0.2063,
+      "n_decades": 12
+    },
+    "Ravenswood_JJA_Rain_Min_Day": {
+      "significant": false,
+      "slope_per_decade": 0.0,
+      "p_value": NaN,
+      "n_decades": 12
+    },
+    "Ravenswood_JJA_Rain_R10mm": {
+      "significant": false,
+      "slope_per_decade": 0.015537,
+      "p_value": 0.5554,
+      "n_decades": 12
+    },
+    "Ravenswood_JJA_Rain_R20mm": {
+      "significant": false,
+      "slope_per_decade": -0.084076,
+      "p_value": 0.3846,
+      "n_decades": 12
+    },
+    "Ravenswood_JJA_Rain_Total": {
+      "significant": false,
+      "slope_per_decade": 0.011234,
+      "p_value": 0.6191,
+      "n_decades": 12
+    },
+    "Ravenswood_JJA_Temp_5-Day_Avg_Max": {
+      "significant": false,
+      "slope_per_decade": -0.054301,
+      "p_value": 0.5339,
+      "n_decades": 11
+    },
+    "Ravenswood_JJA_Temp_5-Day_Avg_Min": {
+      "significant": false,
+      "slope_per_decade": -0.0631,
+      "p_value": 0.2235,
+      "n_decades": 11
+    },
+    "Ravenswood_JJA_Temp_Average": {
+      "significant": false,
+      "slope_per_decade": -0.015251,
+      "p_value": 0.7052,
+      "n_decades": 11
+    },
+    "Ravenswood_JJA_Temp_Avg_Max": {
+      "significant": false,
+      "slope_per_decade": -0.011898,
+      "p_value": 0.7956,
+      "n_decades": 11
+    },
+    "Ravenswood_JJA_Temp_Avg_Min": {
+      "significant": false,
+      "slope_per_decade": -0.013023,
+      "p_value": 0.7852,
+      "n_decades": 11
+    },
+    "Ravenswood_JJA_Temp_Max_Day": {
+      "significant": false,
+      "slope_per_decade": -0.126051,
+      "p_value": 0.1738,
+      "n_decades": 11
+    },
+    "Ravenswood_JJA_Temp_Min_Day": {
+      "significant": true,
+      "slope_per_decade": -0.14384,
+      "p_value": 0.0069,
+      "n_decades": 11
+    },
+    "Ravenswood_JJA_VPD_Average": {
+      "significant": false,
+      "slope_per_decade": -0.016867,
+      "p_value": 0.1392,
+      "n_decades": 5
+    },
+    "Ravenswood_SON_Humidity_Average": {
+      "significant": false,
+      "slope_per_decade": 0.259671,
+      "p_value": 0.5314,
+      "n_decades": 5
+    },
+    "Ravenswood_SON_Rain_CDD": {
+      "significant": false,
+      "slope_per_decade": -0.006999,
+      "p_value": 0.6895,
+      "n_decades": 12
+    },
+    "Ravenswood_SON_Rain_Max_5-Day": {
+      "significant": false,
+      "slope_per_decade": 0.037261,
+      "p_value": 0.5235,
+      "n_decades": 12
+    },
+    "Ravenswood_SON_Rain_Max_Day": {
+      "significant": false,
+      "slope_per_decade": 0.015378,
+      "p_value": 0.654,
+      "n_decades": 12
+    },
+    "Ravenswood_SON_Rain_Min_5-Day": {
+      "significant": true,
+      "slope_per_decade": 0.00303,
+      "p_value": 0.0236,
+      "n_decades": 12
+    },
+    "Ravenswood_SON_Rain_Min_Day": {
+      "significant": false,
+      "slope_per_decade": 0.0,
+      "p_value": NaN,
+      "n_decades": 10
+    },
+    "Ravenswood_SON_Rain_R10mm": {
+      "significant": false,
+      "slope_per_decade": 0.055858,
+      "p_value": 0.3945,
+      "n_decades": 12
+    },
+    "Ravenswood_SON_Rain_R20mm": {
+      "significant": false,
+      "slope_per_decade": 0.174639,
+      "p_value": 0.3811,
+      "n_decades": 11
+    },
+    "Ravenswood_SON_Rain_Total": {
+      "significant": false,
+      "slope_per_decade": 0.019749,
+      "p_value": 0.5386,
+      "n_decades": 12
+    },
+    "Ravenswood_SON_Temp_5-Day_Avg_Max": {
+      "significant": false,
+      "slope_per_decade": -0.016846,
+      "p_value": 0.7881,
+      "n_decades": 11
+    },
+    "Ravenswood_SON_Temp_5-Day_Avg_Min": {
+      "significant": false,
+      "slope_per_decade": -0.024835,
+      "p_value": 0.5991,
+      "n_decades": 11
+    },
+    "Ravenswood_SON_Temp_Average": {
+      "significant": false,
+      "slope_per_decade": 0.059635,
+      "p_value": 0.1029,
+      "n_decades": 11
+    },
+    "Ravenswood_SON_Temp_Avg_Max": {
+      "significant": false,
+      "slope_per_decade": 0.063523,
+      "p_value": 0.0618,
+      "n_decades": 11
+    },
+    "Ravenswood_SON_Temp_Avg_Min": {
+      "significant": false,
+      "slope_per_decade": 0.036493,
+      "p_value": 0.491,
+      "n_decades": 11
+    },
+    "Ravenswood_SON_Temp_Max_Day": {
+      "significant": false,
+      "slope_per_decade": -0.027027,
+      "p_value": 0.6484,
+      "n_decades": 11
+    },
+    "Ravenswood_SON_Temp_Min_Day": {
+      "significant": false,
+      "slope_per_decade": -0.063993,
+      "p_value": 0.3117,
+      "n_decades": 11
+    },
+    "Ravenswood_Annual_Humidity_Average": {
+      "significant": false,
+      "slope_per_decade": 0.521156,
+      "p_value": 0.084,
+      "n_decades": 5
+    },
+    "Ravenswood_Annual_Rain_CDD": {
+      "significant": false,
+      "slope_per_decade": -0.046753,
+      "p_value": 0.0808,
+      "n_decades": 12
+    },
+    "Ravenswood_Annual_Rain_Max_5-Day": {
+      "significant": false,
+      "slope_per_decade": -0.02147,
+      "p_value": 0.4737,
+      "n_decades": 12
+    },
+    "Ravenswood_Annual_Rain_Max_Day": {
+      "significant": false,
+      "slope_per_decade": -0.016363,
+      "p_value": 0.6676,
+      "n_decades": 12
+    },
+    "Ravenswood_Annual_Rain_Min_5-Day": {
+      "significant": false,
+      "slope_per_decade": 0.0,
+      "p_value": NaN,
+      "n_decades": 12
+    },
+    "Ravenswood_Annual_Rain_Min_Day": {
+      "significant": false,
+      "slope_per_decade": 0.0,
+      "p_value": NaN,
+      "n_decades": 4
+    },
+    "Ravenswood_Annual_Rain_R10mm": {
+      "significant": false,
+      "slope_per_decade": -0.007404,
+      "p_value": 0.777,
+      "n_decades": 12
+    },
+    "Ravenswood_Annual_Rain_R20mm": {
+      "significant": false,
+      "slope_per_decade": -0.041034,
+      "p_value": 0.2909,
+      "n_decades": 12
+    },
+    "Ravenswood_Annual_Rain_Total": {
+      "significant": false,
+      "slope_per_decade": -0.00608,
+      "p_value": 0.75,
+      "n_decades": 12
+    },
+    "Ravenswood_Annual_Temp_5-Day_Avg_Max": {
+      "significant": false,
+      "slope_per_decade": -0.00467,
+      "p_value": 0.9406,
+      "n_decades": 11
+    },
+    "Ravenswood_Annual_Temp_5-Day_Avg_Min": {
+      "significant": false,
+      "slope_per_decade": -0.063009,
+      "p_value": 0.2166,
+      "n_decades": 11
+    },
+    "Ravenswood_Annual_Temp_Average": {
+      "significant": false,
+      "slope_per_decade": 0.016075,
+      "p_value": 0.6293,
+      "n_decades": 11
+    },
+    "Ravenswood_Annual_Temp_Avg_Max": {
+      "significant": false,
+      "slope_per_decade": 0.025346,
+      "p_value": 0.4194,
+      "n_decades": 11
+    },
+    "Ravenswood_Annual_Temp_Avg_Min": {
+      "significant": false,
+      "slope_per_decade": 0.001926,
+      "p_value": 0.9604,
+      "n_decades": 11
+    },
+    "Ravenswood_Annual_Temp_Max_Day": {
+      "significant": false,
+      "slope_per_decade": -0.020599,
+      "p_value": 0.8246,
+      "n_decades": 11
+    },
+    "Ravenswood_Annual_Temp_Min_Day": {
+      "significant": true,
+      "slope_per_decade": -0.142384,
+      "p_value": 0.0074,
+      "n_decades": 11
+    }
+  },
+  "corrections": {
+    "Australia": {
+      "DJF": {
+        "Humidity_Average": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1970-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1970": 8.7723,
+            "1980": 7.4672,
+            "1990": 10.7381,
+            "2000": 10.0437,
+            "2010": 9.9427
+          },
+          "average": 9.3928
+        },
+        "Rain_CDD": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 2.0319,
+            "1910": 1.473,
+            "1920": 0.9785,
+            "1930": 1.6341,
+            "1940": 1.2524,
+            "1950": 1.4118,
+            "1960": 1.0206,
+            "1970": 1.1975,
+            "1980": 1.7703,
+            "1990": 0.9186,
+            "2000": 0.8267,
+            "2010": 1.2812
+          },
+          "average": 1.3164
+        },
+        "Rain_Max_5-Day": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": true,
+          "slope_per_decade": 0.014625,
+          "decades": {
+            "1900": 0.4512,
+            "1910": 0.5567,
+            "1920": 0.5971,
+            "1930": 0.5895,
+            "1940": 0.6431,
+            "1950": 0.6804,
+            "1960": 0.5508,
+            "1970": 0.6878,
+            "1980": 0.4991,
+            "1990": 0.6167,
+            "2000": 0.7195,
+            "2010": 0.7265
+          },
+          "average": 0.6099
+        },
+        "Rain_Max_Day": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 0.4842,
+            "1910": 0.541,
+            "1920": 0.5891,
+            "1930": 0.5764,
+            "1940": 0.6063,
+            "1950": 0.6361,
+            "1960": 0.5224,
+            "1970": 0.6574,
+            "1980": 0.4673,
+            "1990": 0.5736,
+            "2000": 0.6877,
+            "2010": 0.7546
+          },
+          "average": 0.5913
+        },
+        "Rain_Min_5-Day": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 0.4756,
+            "1910": 1.1181,
+            "1920": 1.0159,
+            "1930": 0.6944,
+            "1940": 0.8497,
+            "1950": 0.8716,
+            "1960": 1.3961,
+            "1970": 0.8043,
+            "1980": 0.9349,
+            "1990": 1.1074,
+            "2000": 1.0083,
+            "2010": 0.8381
+          },
+          "average": 0.9262
+        },
+        "Rain_Min_Day": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 0.4147,
+            "1910": 1.0841,
+            "1920": 0.9557,
+            "1930": 0.5592,
+            "1940": 0.8066,
+            "1950": 0.8475,
+            "1960": 1.3111,
+            "1970": 0.8002,
+            "1980": 0.9347,
+            "1990": 1.1795,
+            "2000": 1.077,
+            "2010": 0.9292
+          },
+          "average": 0.9083
+        },
+        "Rain_R10mm": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 0.0,
+            "1910": 0.0,
+            "1920": 0.0,
+            "1930": 0.0,
+            "1940": 0.0,
+            "1950": 0.0,
+            "1960": 0.0,
+            "1970": 0.0,
+            "1980": 0.0,
+            "1990": 0.0,
+            "2000": 0.0,
+            "2010": 0.0
+          },
+          "average": 0.0
+        },
+        "Rain_Total": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": true,
+          "slope_per_decade": 0.018834,
+          "decades": {
+            "1900": 0.503,
+            "1910": 0.6954,
+            "1920": 0.6885,
+            "1930": 0.6027,
+            "1940": 0.6971,
+            "1950": 0.7876,
+            "1960": 0.823,
+            "1970": 0.7957,
+            "1980": 0.5925,
+            "1990": 0.7992,
+            "2000": 0.7839,
+            "2010": 0.8244
+          },
+          "average": 0.7161
+        },
+        "Temp_5-Day_Avg_Max": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": true,
+          "slope_per_decade": 0.111698,
+          "decades": {
+            "1850": -8.4221,
+            "1860": -8.3104,
+            "1870": -8.1987,
+            "1880": -8.087,
+            "1890": -7.9753,
+            "1900": -7.8636,
+            "1910": -7.7519,
+            "1920": -7.6137,
+            "1930": -7.1066,
+            "1940": -7.3077,
+            "1950": -7.686,
+            "1960": -7.4281,
+            "1970": -6.6383,
+            "1980": -6.5032,
+            "1990": -7.214,
+            "2000": -7.2735,
+            "2010": -6.0336
+          },
+          "average": -7.4949
+        },
+        "Temp_5-Day_Avg_Min": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": -1.8303,
+            "1860": -1.8303,
+            "1870": -1.8303,
+            "1880": -1.8303,
+            "1890": -1.8303,
+            "1900": -1.8303,
+            "1910": -1.8303,
+            "1920": -1.6848,
+            "1930": -2.4534,
+            "1940": -2.8788,
+            "1950": -2.5281,
+            "1960": -2.3219,
+            "1970": -2.0813,
+            "1980": -2.1932,
+            "1990": -1.5463,
+            "2000": -2.8402,
+            "2010": -1.9595
+          },
+          "average": -2.0764
+        },
+        "Temp_Average": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": -4.5145,
+            "1860": -4.5145,
+            "1870": -4.5145,
+            "1880": -4.5145,
+            "1890": -4.5145,
+            "1900": -4.5145,
+            "1910": -4.5145,
+            "1920": -4.5732,
+            "1930": -4.5399,
+            "1940": -5.0004,
+            "1950": -5.0094,
+            "1960": -4.8337,
+            "1970": -4.2591,
+            "1980": -4.1593,
+            "1990": -4.5802,
+            "2000": -4.6317,
+            "2010": -4.359
+          },
+          "average": -4.5616
+        },
+        "Temp_Avg_Max": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": -5.6354,
+            "1860": -5.6354,
+            "1870": -5.6354,
+            "1880": -5.6354,
+            "1890": -5.6354,
+            "1900": -5.6354,
+            "1910": -5.6354,
+            "1920": -5.6469,
+            "1930": -5.5422,
+            "1940": -6.0442,
+            "1950": -6.0021,
+            "1960": -5.9201,
+            "1970": -5.2458,
+            "1980": -5.0366,
+            "1990": -5.6566,
+            "2000": -5.6872,
+            "2010": -5.3656
+          },
+          "average": -5.6232
+        },
+        "Temp_Avg_Min": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": -3.2429,
+            "1860": -3.2429,
+            "1870": -3.2429,
+            "1880": -3.2429,
+            "1890": -3.2429,
+            "1900": -3.2429,
+            "1910": -3.2429,
+            "1920": -3.3134,
+            "1930": -3.4272,
+            "1940": -3.8295,
+            "1950": -3.8697,
+            "1960": -3.5699,
+            "1970": -3.1812,
+            "1980": -3.2096,
+            "1990": -3.364,
+            "2000": -3.4875,
+            "2010": -3.251
+          },
+          "average": -3.3649
+        },
+        "Temp_Max_Day": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": true,
+          "slope_per_decade": 0.099932,
+          "decades": {
+            "1850": -8.406,
+            "1860": -8.3061,
+            "1870": -8.2062,
+            "1880": -8.1063,
+            "1890": -8.0063,
+            "1900": -7.9064,
+            "1910": -7.8065,
+            "1920": -7.7245,
+            "1930": -7.3903,
+            "1940": -7.4274,
+            "1950": -7.6638,
+            "1960": -7.5231,
+            "1970": -6.96,
+            "1980": -6.4354,
+            "1990": -7.4333,
+            "2000": -7.3814,
+            "2010": -6.3942
+          },
+          "average": -7.5928
+        },
+        "Temp_Min_Day": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": -1.5587,
+            "1860": -1.5587,
+            "1870": -1.5587,
+            "1880": -1.5587,
+            "1890": -1.5587,
+            "1900": -1.5587,
+            "1910": -1.5587,
+            "1920": -1.4469,
+            "1930": -1.9622,
+            "1940": -2.7564,
+            "1950": -2.2696,
+            "1960": -2.5198,
+            "1970": -1.6642,
+            "1980": -2.2131,
+            "1990": -1.0637,
+            "2000": -2.5405,
+            "2010": -1.3946
+          },
+          "average": -1.8083
+        },
+        "VPD_Average": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1970-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1970": -0.6368,
+            "1980": -0.6037,
+            "1990": -0.7678,
+            "2000": -0.7594,
+            "2010": -0.7288
+          },
+          "average": -0.6993
+        }
+      },
+      "MAM": {
+        "Humidity_Average": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1970-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1970": -13.2929,
+            "1980": -16.2226,
+            "1990": -13.4673,
+            "2000": -14.119,
+            "2010": -10.6397
+          },
+          "average": -13.5483
+        },
+        "Rain_CDD": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 1.5754,
+            "1910": 0.8472,
+            "1920": 1.0189,
+            "1930": 1.0311,
+            "1940": 0.9817,
+            "1950": 0.8469,
+            "1960": 0.7442,
+            "1970": 1.1056,
+            "1980": 0.7923,
+            "1990": 1.0794,
+            "2000": 1.117,
+            "2010": 1.2353
+          },
+          "average": 1.0313
+        },
+        "Rain_Max_5-Day": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": true,
+          "slope_per_decade": 0.027989,
+          "decades": {
+            "1900": 0.3938,
+            "1910": 0.5966,
+            "1920": 0.5177,
+            "1930": 0.5073,
+            "1940": 0.5189,
+            "1950": 0.5582,
+            "1960": 0.6447,
+            "1970": 0.8018,
+            "1980": 0.5715,
+            "1990": 0.6079,
+            "2000": 0.656,
+            "2010": 0.9014
+          },
+          "average": 0.6063
+        },
+        "Rain_Max_Day": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": true,
+          "slope_per_decade": 0.018206,
+          "decades": {
+            "1900": 0.3858,
+            "1910": 0.5657,
+            "1920": 0.5498,
+            "1930": 0.5266,
+            "1940": 0.5462,
+            "1950": 0.5636,
+            "1960": 0.5812,
+            "1970": 0.7815,
+            "1980": 0.5944,
+            "1990": 0.56,
+            "2000": 0.6049,
+            "2010": 0.724
+          },
+          "average": 0.582
+        },
+        "Rain_Min_5-Day": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 0.9451,
+            "1910": 1.4165,
+            "1920": 1.7411,
+            "1930": 1.4518,
+            "1940": 1.9413,
+            "1950": 2.0645,
+            "1960": 1.2722,
+            "1970": 2.0121,
+            "1980": 1.9143,
+            "1990": 1.1814,
+            "2000": 1.8459,
+            "2010": 1.2856
+          },
+          "average": 1.5893
+        },
+        "Rain_Min_Day": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 0.865,
+            "1910": 2.3679,
+            "1920": 1.8763,
+            "1930": 1.5505,
+            "1940": 1.9977,
+            "1950": 2.0899,
+            "1960": 1.7552,
+            "1970": 2.0409,
+            "1980": 2.4094,
+            "1990": 1.5253,
+            "2000": 2.0639,
+            "2010": 1.5463
+          },
+          "average": 1.8407
+        },
+        "Rain_R10mm": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 0.0,
+            "1920": 0.0,
+            "1930": 0.0,
+            "1940": 0.0,
+            "1950": 0.5,
+            "1960": 0.0,
+            "1990": 0.0,
+            "2010": 0.0
+          },
+          "average": 0.0625
+        },
+        "Rain_Total": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": true,
+          "slope_per_decade": 0.02548,
+          "decades": {
+            "1900": 0.4772,
+            "1910": 0.6931,
+            "1920": 0.6531,
+            "1930": 0.6128,
+            "1940": 0.6539,
+            "1950": 0.7302,
+            "1960": 0.699,
+            "1970": 0.8747,
+            "1980": 0.6557,
+            "1990": 0.7407,
+            "2000": 0.7606,
+            "2010": 0.9519
+          },
+          "average": 0.7086
+        },
+        "Temp_5-Day_Avg_Max": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": -5.2211,
+            "1860": -5.2211,
+            "1870": -5.2211,
+            "1880": -5.2211,
+            "1890": -5.2211,
+            "1900": -5.2211,
+            "1910": -5.2211,
+            "1920": -4.2126,
+            "1930": -4.3104,
+            "1940": -3.954,
+            "1950": -4.4015,
+            "1960": -4.5739,
+            "1970": -3.6063,
+            "1980": -3.9816,
+            "1990": -4.8304,
+            "2000": -5.3252,
+            "2010": -5.8001
+          },
+          "average": -4.7967
+        },
+        "Temp_5-Day_Avg_Min": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": 1.4771,
+            "1860": 1.4771,
+            "1870": 1.4771,
+            "1880": 1.4771,
+            "1890": 1.4771,
+            "1900": 1.4771,
+            "1910": 1.4771,
+            "1920": 2.5723,
+            "1930": 2.7621,
+            "1940": 2.4032,
+            "1950": 1.8768,
+            "1960": 1.8418,
+            "1970": 2.213,
+            "1980": 3.2876,
+            "1990": 1.9403,
+            "2000": 1.2611,
+            "2010": 1.0156
+          },
+          "average": 1.8537
+        },
+        "Temp_Average": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": -1.2114,
+            "1860": -1.2114,
+            "1870": -1.2114,
+            "1880": -1.2114,
+            "1890": -1.2114,
+            "1900": -1.2114,
+            "1910": -1.2114,
+            "1920": -0.6154,
+            "1930": -0.6688,
+            "1940": -0.889,
+            "1950": -0.7541,
+            "1960": -0.8863,
+            "1970": -0.7046,
+            "1980": -0.1528,
+            "1990": -0.9646,
+            "2000": -0.9892,
+            "2010": -1.3301
+          },
+          "average": -0.9667
+        },
+        "Temp_Avg_Max": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": -1.7378,
+            "1860": -1.7378,
+            "1870": -1.7378,
+            "1880": -1.7378,
+            "1890": -1.7378,
+            "1900": -1.7378,
+            "1910": -1.7378,
+            "1920": -0.9612,
+            "1930": -0.9564,
+            "1940": -1.2149,
+            "1950": -1.1124,
+            "1960": -1.1543,
+            "1970": -1.0714,
+            "1980": -0.4344,
+            "1990": -1.3752,
+            "2000": -1.3119,
+            "2010": -1.8671
+          },
+          "average": -1.3896
+        },
+        "Temp_Avg_Min": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": -0.7774,
+            "1860": -0.7774,
+            "1870": -0.7774,
+            "1880": -0.7774,
+            "1890": -0.7774,
+            "1900": -0.7774,
+            "1910": -0.7774,
+            "1920": -0.4082,
+            "1930": -0.5432,
+            "1940": -0.7015,
+            "1950": -0.5119,
+            "1960": -0.7534,
+            "1970": -0.4636,
+            "1980": -0.059,
+            "1990": -0.6582,
+            "2000": -0.797,
+            "2010": -0.9192
+          },
+          "average": -0.6622
+        },
+        "Temp_Max_Day": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": -5.2259,
+            "1860": -5.2259,
+            "1870": -5.2259,
+            "1880": -5.2259,
+            "1890": -5.2259,
+            "1900": -5.2259,
+            "1910": -5.2259,
+            "1920": -4.395,
+            "1930": -4.2384,
+            "1940": -3.7296,
+            "1950": -4.3338,
+            "1960": -4.1753,
+            "1970": -3.7449,
+            "1980": -3.4964,
+            "1990": -4.6998,
+            "2000": -5.0803,
+            "2010": -5.1586
+          },
+          "average": -4.6843
+        },
+        "Temp_Min_Day": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": 1.9296,
+            "1860": 1.9296,
+            "1870": 1.9296,
+            "1880": 1.9296,
+            "1890": 1.9296,
+            "1900": 1.9296,
+            "1910": 1.9296,
+            "1920": 3.0068,
+            "1930": 3.1333,
+            "1940": 2.3519,
+            "1950": 2.3214,
+            "1960": 2.1345,
+            "1970": 2.7162,
+            "1980": 3.7082,
+            "1990": 2.3316,
+            "2000": 1.4932,
+            "2010": 1.4904
+          },
+          "average": 2.2467
+        }
+      },
+      "JJA": {
+        "Humidity_Average": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1970-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1970": -31.1256,
+            "1980": -32.2014,
+            "1990": -31.6467,
+            "2000": -33.466,
+            "2010": -32.5392
+          },
+          "average": -32.1958
+        },
+        "Rain_CDD": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 2.1189,
+            "1910": 0.8179,
+            "1920": 0.8627,
+            "1930": 0.8333,
+            "1940": 0.966,
+            "1950": 0.6525,
+            "1960": 0.6494,
+            "1970": 1.1862,
+            "1980": 0.9717,
+            "1990": 0.8582,
+            "2000": 0.9898,
+            "2010": 1.0991
+          },
+          "average": 1.0005
+        },
+        "Rain_Max_5-Day": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 0.4272,
+            "1910": 0.7889,
+            "1920": 0.7512,
+            "1930": 0.5267,
+            "1940": 0.8213,
+            "1950": 0.7102,
+            "1960": 0.649,
+            "1970": 0.5076,
+            "1980": 0.5916,
+            "1990": 0.6085,
+            "2000": 0.5723,
+            "2010": 0.6579
+          },
+          "average": 0.6344
+        },
+        "Rain_Max_Day": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 0.4595,
+            "1910": 0.762,
+            "1920": 0.7859,
+            "1930": 0.6219,
+            "1940": 0.8281,
+            "1950": 0.7954,
+            "1960": 0.6213,
+            "1970": 0.4778,
+            "1980": 0.5955,
+            "1990": 0.733,
+            "2000": 0.664,
+            "2010": 0.7512
+          },
+          "average": 0.6746
+        },
+        "Rain_Min_5-Day": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 1.1244,
+            "1910": 2.0839,
+            "1920": 2.4689,
+            "1930": 2.1765,
+            "1940": 1.8685,
+            "1950": 2.1656,
+            "1960": 2.3944,
+            "1970": 2.0061,
+            "1980": 1.6805,
+            "1990": 2.1356,
+            "2000": 1.8426,
+            "2010": 2.2762
+          },
+          "average": 2.0186
+        },
+        "Rain_Min_Day": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 1.1692,
+            "1910": 2.1605,
+            "1920": 2.1851,
+            "1930": 2.1978,
+            "1940": 2.0826,
+            "1950": 2.5717,
+            "1960": 2.5981,
+            "1970": 1.6696,
+            "1980": 1.8126,
+            "1990": 2.1083,
+            "2000": 1.7616,
+            "2010": 1.4417
+          },
+          "average": 1.9799
+        },
+        "Rain_Total": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 0.5907,
+            "1910": 1.0942,
+            "1920": 1.1154,
+            "1930": 0.9229,
+            "1940": 1.1263,
+            "1950": 1.2404,
+            "1960": 0.9554,
+            "1970": 0.7126,
+            "1980": 0.7323,
+            "1990": 1.0829,
+            "2000": 0.8471,
+            "2010": 1.0723
+          },
+          "average": 0.9577
+        },
+        "Temp_5-Day_Avg_Max": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": -1.0958,
+            "1860": -1.0958,
+            "1870": -1.0958,
+            "1880": -1.0958,
+            "1890": -1.0958,
+            "1900": -1.0958,
+            "1910": -1.0958,
+            "1920": -0.6001,
+            "1930": -0.7191,
+            "1940": -1.2203,
+            "1950": -0.8208,
+            "1960": 0.4297,
+            "1970": 0.0993,
+            "1980": 0.1687,
+            "1990": -0.2167,
+            "2000": -0.6038,
+            "2010": -0.3812
+          },
+          "average": -0.6785
+        },
+        "Temp_5-Day_Avg_Min": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": 3.3795,
+            "1860": 3.3795,
+            "1870": 3.3795,
+            "1880": 3.3795,
+            "1890": 3.3795,
+            "1900": 3.3795,
+            "1910": 3.3795,
+            "1920": 3.3377,
+            "1930": 3.5009,
+            "1940": 2.7,
+            "1950": 3.3329,
+            "1960": 2.6447,
+            "1970": 2.9814,
+            "1980": 3.1576,
+            "1990": 3.3583,
+            "2000": 2.7989,
+            "2010": 3.0847
+          },
+          "average": 3.209
+        },
+        "Temp_Average": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": 1.8884,
+            "1860": 1.8884,
+            "1870": 1.8884,
+            "1880": 1.8884,
+            "1890": 1.8884,
+            "1900": 1.8884,
+            "1910": 1.8884,
+            "1920": 2.1196,
+            "1930": 1.8812,
+            "1940": 1.6906,
+            "1950": 1.9211,
+            "1960": 2.0986,
+            "1970": 2.3216,
+            "1980": 2.286,
+            "1990": 2.1384,
+            "2000": 1.8536,
+            "2010": 1.6122
+          },
+          "average": 1.9495
+        },
+        "Temp_Avg_Max": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": 1.3431,
+            "1860": 1.3431,
+            "1870": 1.3431,
+            "1880": 1.3431,
+            "1890": 1.3431,
+            "1900": 1.3431,
+            "1910": 1.3431,
+            "1920": 1.6768,
+            "1930": 1.5026,
+            "1940": 1.27,
+            "1950": 1.5083,
+            "1960": 1.9659,
+            "1970": 2.3874,
+            "1980": 2.2343,
+            "1990": 1.7744,
+            "2000": 1.7721,
+            "2010": 1.3418
+          },
+          "average": 1.5785
+        },
+        "Temp_Avg_Min": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": 2.2675,
+            "1860": 2.2675,
+            "1870": 2.2675,
+            "1880": 2.2675,
+            "1890": 2.2675,
+            "1900": 2.2675,
+            "1910": 2.2675,
+            "1920": 2.3713,
+            "1930": 2.0662,
+            "1940": 1.9518,
+            "1950": 2.1626,
+            "1960": 2.0649,
+            "1970": 2.0629,
+            "1980": 2.1512,
+            "1990": 2.3183,
+            "2000": 1.7639,
+            "2010": 1.6965
+          },
+          "average": 2.146
+        },
+        "Temp_Max_Day": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": -1.6502,
+            "1860": -1.6502,
+            "1870": -1.6502,
+            "1880": -1.6502,
+            "1890": -1.6502,
+            "1900": -1.6502,
+            "1910": -1.6502,
+            "1920": -1.2785,
+            "1930": -1.2073,
+            "1940": -1.9073,
+            "1950": -1.2189,
+            "1960": 0.0704,
+            "1970": -0.7083,
+            "1980": -0.313,
+            "1990": -0.9028,
+            "2000": -0.8596,
+            "2010": -0.7907
+          },
+          "average": -1.2157
+        },
+        "Temp_Min_Day": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": 3.6211,
+            "1860": 3.6211,
+            "1870": 3.6211,
+            "1880": 3.6211,
+            "1890": 3.6211,
+            "1900": 3.6211,
+            "1910": 3.6211,
+            "1920": 3.5044,
+            "1930": 3.7185,
+            "1940": 2.7502,
+            "1950": 3.3233,
+            "1960": 2.6997,
+            "1970": 3.277,
+            "1980": 3.3638,
+            "1990": 3.3624,
+            "2000": 2.8275,
+            "2010": 3.3091
+          },
+          "average": 3.3814
+        },
+        "VPD_Average": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1970-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1970": 0.5902,
+            "1980": 0.612,
+            "1990": 0.61,
+            "2000": 0.644,
+            "2010": 0.6301
+          },
+          "average": 0.6173
+        }
+      },
+      "SON": {
+        "Humidity_Average": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1970-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1970": -12.7197,
+            "1980": -13.9216,
+            "1990": -11.4,
+            "2000": -11.9331,
+            "2010": -11.6684
+          },
+          "average": -12.3286
+        },
+        "Rain_CDD": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 1.1928,
+            "1910": 0.9895,
+            "1920": 0.7953,
+            "1930": 0.9654,
+            "1940": 0.8264,
+            "1950": 0.7896,
+            "1960": 1.049,
+            "1970": 0.931,
+            "1980": 1.2388,
+            "1990": 0.7722,
+            "2000": 1.0987,
+            "2010": 1.0982
+          },
+          "average": 0.9789
+        },
+        "Rain_Max_5-Day": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": true,
+          "slope_per_decade": 0.01339,
+          "decades": {
+            "1900": 0.6562,
+            "1910": 0.4753,
+            "1920": 0.6591,
+            "1930": 0.7093,
+            "1940": 0.7549,
+            "1950": 0.7423,
+            "1960": 0.7009,
+            "1970": 0.7183,
+            "1980": 0.6632,
+            "1990": 0.6986,
+            "2000": 0.7945,
+            "2010": 0.7526
+          },
+          "average": 0.6938
+        },
+        "Rain_Max_Day": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": true,
+          "slope_per_decade": 0.01071,
+          "decades": {
+            "1900": 0.6067,
+            "1910": 0.4609,
+            "1920": 0.6293,
+            "1930": 0.6872,
+            "1940": 0.6828,
+            "1950": 0.6072,
+            "1960": 0.629,
+            "1970": 0.685,
+            "1980": 0.6739,
+            "1990": 0.6758,
+            "2000": 0.692,
+            "2010": 0.67
+          },
+          "average": 0.6417
+        },
+        "Rain_Min_5-Day": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 1.9406,
+            "1910": 1.5727,
+            "1920": 2.4242,
+            "1930": 2.5222,
+            "1940": 2.1764,
+            "1950": 3.3889,
+            "1960": 2.3052,
+            "1970": 2.7819,
+            "1980": 1.163,
+            "1990": 1.7645,
+            "2000": 1.8289,
+            "2010": 1.3465
+          },
+          "average": 2.1012
+        },
+        "Rain_Min_Day": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 1.5495,
+            "1910": 1.8422,
+            "1920": 2.8844,
+            "1930": 2.5292,
+            "1940": 2.2697,
+            "1950": 3.1605,
+            "1960": 2.4726,
+            "1970": 2.86,
+            "1980": 1.475,
+            "1990": 1.7904,
+            "2000": 1.8366,
+            "2010": 1.0219
+          },
+          "average": 2.141
+        },
+        "Rain_Total": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 0.6941,
+            "1910": 0.7041,
+            "1920": 0.7607,
+            "1930": 0.9932,
+            "1940": 0.9292,
+            "1950": 1.0337,
+            "1960": 0.9223,
+            "1970": 0.9151,
+            "1980": 0.7854,
+            "1990": 0.9327,
+            "2000": 0.9433,
+            "2010": 0.7633
+          },
+          "average": 0.8648
+        },
+        "Temp_5-Day_Avg_Max": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": -5.2958,
+            "1860": -5.2958,
+            "1870": -5.2958,
+            "1880": -5.2958,
+            "1890": -5.2958,
+            "1900": -5.2958,
+            "1910": -5.2958,
+            "1920": -5.8099,
+            "1930": -6.1095,
+            "1940": -6.8411,
+            "1950": -6.38,
+            "1960": -5.7038,
+            "1970": -5.1583,
+            "1980": -5.6705,
+            "1990": -5.6998,
+            "2000": -6.2292,
+            "2010": -6.0711
+          },
+          "average": -5.6908
+        },
+        "Temp_5-Day_Avg_Min": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": 1.544,
+            "1860": 1.544,
+            "1870": 1.544,
+            "1880": 1.544,
+            "1890": 1.544,
+            "1900": 1.544,
+            "1910": 1.544,
+            "1920": 1.2624,
+            "1930": 1.4786,
+            "1940": 0.7786,
+            "1950": 0.7979,
+            "1960": 1.7063,
+            "1970": 0.9188,
+            "1980": 1.7537,
+            "1990": 1.3294,
+            "2000": 1.129,
+            "2010": 0.8021
+          },
+          "average": 1.3391
+        },
+        "Temp_Average": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": -2.1945,
+            "1860": -2.1945,
+            "1870": -2.1945,
+            "1880": -2.1945,
+            "1890": -2.1945,
+            "1900": -2.1945,
+            "1910": -2.1945,
+            "1920": -2.2669,
+            "1930": -2.1105,
+            "1940": -2.7782,
+            "1950": -2.7643,
+            "1960": -2.2024,
+            "1970": -2.1055,
+            "1980": -1.9104,
+            "1990": -2.1796,
+            "2000": -2.3612,
+            "2010": -2.4128
+          },
+          "average": -2.262
+        },
+        "Temp_Avg_Max": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": -3.0764,
+            "1860": -3.0764,
+            "1870": -3.0764,
+            "1880": -3.0764,
+            "1890": -3.0764,
+            "1900": -3.0764,
+            "1910": -3.0764,
+            "1920": -3.0831,
+            "1930": -3.0668,
+            "1940": -3.6991,
+            "1950": -3.6783,
+            "1960": -2.9539,
+            "1970": -2.918,
+            "1980": -2.6795,
+            "1990": -3.0611,
+            "2000": -3.1377,
+            "2010": -3.0628
+          },
+          "average": -3.1103
+        },
+        "Temp_Avg_Min": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": -1.0191,
+            "1860": -1.0191,
+            "1870": -1.0191,
+            "1880": -1.0191,
+            "1890": -1.0191,
+            "1900": -1.0191,
+            "1910": -1.0191,
+            "1920": -1.1399,
+            "1930": -0.8292,
+            "1940": -1.5222,
+            "1950": -1.5215,
+            "1960": -1.1432,
+            "1970": -1.0236,
+            "1980": -0.8936,
+            "1990": -1.0029,
+            "2000": -1.2917,
+            "2010": -1.5414
+          },
+          "average": -1.1202
+        },
+        "Temp_Max_Day": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": -5.9256,
+            "1860": -5.9256,
+            "1870": -5.9256,
+            "1880": -5.9256,
+            "1890": -5.9256,
+            "1900": -5.9256,
+            "1910": -5.9256,
+            "1920": -6.0166,
+            "1930": -6.5463,
+            "1940": -7.0966,
+            "1950": -6.4552,
+            "1960": -5.6411,
+            "1970": -5.5345,
+            "1980": -5.8486,
+            "1990": -6.0633,
+            "2000": -6.4503,
+            "2010": -6.6635
+          },
+          "average": -6.1056
+        },
+        "Temp_Min_Day": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": 1.7866,
+            "1860": 1.7866,
+            "1870": 1.7866,
+            "1880": 1.7866,
+            "1890": 1.7866,
+            "1900": 1.7866,
+            "1910": 1.7866,
+            "1920": 1.356,
+            "1930": 1.625,
+            "1940": 0.9138,
+            "1950": 1.0372,
+            "1960": 1.6716,
+            "1970": 1.0138,
+            "1980": 2.1427,
+            "1990": 1.5539,
+            "2000": 1.3403,
+            "2010": 1.0968
+          },
+          "average": 1.5445
+        }
+      },
+      "Annual": {
+        "Humidity_Average": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1970-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1970": -12.2777,
+            "1980": -13.8175,
+            "1990": -11.4408,
+            "2000": -12.5226,
+            "2010": -11.257
+          },
+          "average": -12.2631
+        },
+        "Rain_CDD": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 1.714,
+            "1910": 0.7488,
+            "1920": 0.6862,
+            "1930": 0.8241,
+            "1940": 0.8665,
+            "1950": 0.692,
+            "1960": 0.9415,
+            "1970": 1.0693,
+            "1980": 1.0981,
+            "1990": 0.7485,
+            "2000": 0.853,
+            "2010": 0.8882
+          },
+          "average": 0.9275
+        },
+        "Rain_Max_5-Day": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": true,
+          "slope_per_decade": 0.01557,
+          "decades": {
+            "1900": 0.4194,
+            "1910": 0.5416,
+            "1920": 0.5605,
+            "1930": 0.5689,
+            "1940": 0.5988,
+            "1950": 0.5874,
+            "1960": 0.5411,
+            "1970": 0.6993,
+            "1980": 0.5615,
+            "1990": 0.6363,
+            "2000": 0.6725,
+            "2010": 0.6491
+          },
+          "average": 0.5864
+        },
+        "Rain_Max_Day": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": true,
+          "slope_per_decade": 0.01169,
+          "decades": {
+            "1900": 0.4236,
+            "1910": 0.5455,
+            "1920": 0.5834,
+            "1930": 0.5723,
+            "1940": 0.5881,
+            "1950": 0.5839,
+            "1960": 0.5163,
+            "1970": 0.6638,
+            "1980": 0.5525,
+            "1990": 0.5683,
+            "2000": 0.6529,
+            "2010": 0.6438
+          },
+          "average": 0.5745
+        },
+        "Rain_Min_5-Day": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 1.6959,
+            "1910": 2.0725,
+            "1920": 2.9457,
+            "1930": 2.5534,
+            "1940": 2.1035,
+            "1950": 3.172,
+            "1960": 2.3144,
+            "1970": 2.5154,
+            "1980": 1.4306,
+            "1990": 2.0379,
+            "2000": 2.0115,
+            "2010": 1.7552
+          },
+          "average": 2.2173
+        },
+        "Rain_Min_Day": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 1.4065,
+            "1910": 2.1824,
+            "1920": 3.1039,
+            "1930": 2.253,
+            "1940": 2.2905,
+            "1950": 2.9152,
+            "1960": 2.2179,
+            "1970": 2.55,
+            "1980": 1.5368,
+            "1990": 2.1367,
+            "2000": 2.1589,
+            "2010": 1.4897
+          },
+          "average": 2.1868
+        },
+        "Rain_R10mm": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 0.0,
+            "1910": 0.0,
+            "1920": 0.0,
+            "1930": 0.0,
+            "1940": 0.0,
+            "1950": 0.25,
+            "1960": 0.0,
+            "1970": 0.0,
+            "1980": 0.0,
+            "1990": 0.0,
+            "2000": 0.0,
+            "2010": 0.0
+          },
+          "average": 0.0208
+        },
+        "Rain_Total": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": true,
+          "slope_per_decade": 0.016844,
+          "decades": {
+            "1900": 0.5386,
+            "1910": 0.7502,
+            "1920": 0.7397,
+            "1930": 0.6977,
+            "1940": 0.7644,
+            "1950": 0.8655,
+            "1960": 0.8169,
+            "1970": 0.8092,
+            "1980": 0.6583,
+            "1990": 0.8461,
+            "2000": 0.8098,
+            "2010": 0.8703
+          },
+          "average": 0.7639
+        },
+        "Temp_5-Day_Avg_Max": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": -7.7452,
+            "1860": -7.7452,
+            "1870": -7.7452,
+            "1880": -7.7452,
+            "1890": -7.7452,
+            "1900": -7.7452,
+            "1910": -7.7452,
+            "1920": -7.7542,
+            "1930": -7.2466,
+            "1940": -7.5636,
+            "1950": -7.9123,
+            "1960": -7.3913,
+            "1970": -6.7723,
+            "1980": -6.7668,
+            "1990": -7.0522,
+            "2000": -7.7967,
+            "2010": -6.6243
+          },
+          "average": -7.4763
+        },
+        "Temp_5-Day_Avg_Min": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": 3.3795,
+            "1860": 3.3795,
+            "1870": 3.3795,
+            "1880": 3.3795,
+            "1890": 3.3795,
+            "1900": 3.3795,
+            "1910": 3.3795,
+            "1920": 3.3377,
+            "1930": 3.5009,
+            "1940": 2.7,
+            "1950": 3.3329,
+            "1960": 2.6447,
+            "1970": 2.9814,
+            "1980": 3.1576,
+            "1990": 3.3583,
+            "2000": 2.7989,
+            "2010": 3.0847
+          },
+          "average": 3.209
+        },
+        "Temp_Average": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": -1.4937,
+            "1860": -1.4937,
+            "1870": -1.4937,
+            "1880": -1.4937,
+            "1890": -1.4937,
+            "1900": -1.4937,
+            "1910": -1.4937,
+            "1920": -1.327,
+            "1930": -1.3419,
+            "1940": -1.7203,
+            "1950": -1.6447,
+            "1960": -1.442,
+            "1970": -1.1399,
+            "1980": -0.9655,
+            "1990": -1.4045,
+            "2000": -1.5074,
+            "2010": -1.6082
+          },
+          "average": -1.4445
+        },
+        "Temp_Avg_Max": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": -2.2583,
+            "1860": -2.2583,
+            "1870": -2.2583,
+            "1880": -2.2583,
+            "1890": -2.2583,
+            "1900": -2.2583,
+            "1910": -2.2583,
+            "1920": -1.9921,
+            "1930": -1.996,
+            "1940": -2.3946,
+            "1950": -2.3177,
+            "1960": -1.9976,
+            "1970": -1.6529,
+            "1980": -1.4598,
+            "1990": -2.0929,
+            "2000": -2.0615,
+            "2010": -2.2231
+          },
+          "average": -2.1174
+        },
+        "Temp_Avg_Min": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": -0.6808,
+            "1860": -0.6808,
+            "1870": -0.6808,
+            "1880": -0.6808,
+            "1890": -0.6808,
+            "1900": -0.6808,
+            "1910": -0.6808,
+            "1920": -0.6241,
+            "1930": -0.6695,
+            "1940": -1.0061,
+            "1950": -0.9241,
+            "1960": -0.841,
+            "1970": -0.6198,
+            "1980": -0.4861,
+            "1990": -0.6808,
+            "2000": -0.9316,
+            "2010": -0.9925
+          },
+          "average": -0.7377
+        },
+        "Temp_Max_Day": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": -7.7969,
+            "1860": -7.7969,
+            "1870": -7.7969,
+            "1880": -7.7969,
+            "1890": -7.7969,
+            "1900": -7.7969,
+            "1910": -7.7969,
+            "1920": -7.7892,
+            "1930": -7.5472,
+            "1940": -7.616,
+            "1950": -8.0314,
+            "1960": -7.4852,
+            "1970": -6.8181,
+            "1980": -6.6427,
+            "1990": -7.3484,
+            "2000": -7.9724,
+            "2010": -6.8072
+          },
+          "average": -7.5668
+        },
+        "Temp_Min_Day": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": 3.6211,
+            "1860": 3.6211,
+            "1870": 3.6211,
+            "1880": 3.6211,
+            "1890": 3.6211,
+            "1900": 3.6211,
+            "1910": 3.6211,
+            "1920": 3.5044,
+            "1930": 3.7185,
+            "1940": 2.7502,
+            "1950": 3.3233,
+            "1960": 2.6997,
+            "1970": 3.277,
+            "1980": 3.3638,
+            "1990": 3.3624,
+            "2000": 2.8275,
+            "2010": 3.3091
+          },
+          "average": 3.3814
+        }
+      }
+    },
+    "Ravenswood": {
+      "DJF": {
+        "Humidity_Average": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1970-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1970": 7.6294,
+            "1980": 3.137,
+            "1990": 6.7471,
+            "2000": 7.1094,
+            "2010": 5.9202
+          },
+          "average": 6.1086
+        },
+        "Rain_CDD": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 0.567,
+            "1910": 0.6808,
+            "1920": 0.621,
+            "1930": 0.9691,
+            "1940": 0.5694,
+            "1950": 0.8715,
+            "1960": 0.7085,
+            "1970": 0.6134,
+            "1980": 1.125,
+            "1990": 0.5407,
+            "2000": 0.7416,
+            "2010": 0.8085
+          },
+          "average": 0.7347
+        },
+        "Rain_Max_5-Day": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 1.6581,
+            "1910": 2.604,
+            "1920": 1.8554,
+            "1930": 1.6256,
+            "1940": 2.731,
+            "1950": 1.9002,
+            "1960": 1.8654,
+            "1970": 1.7965,
+            "1980": 0.9509,
+            "1990": 1.1714,
+            "2000": 1.8192,
+            "2010": 1.7597
+          },
+          "average": 1.8114
+        },
+        "Rain_Max_Day": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 1.4935,
+            "1910": 2.6466,
+            "1920": 1.9656,
+            "1930": 1.481,
+            "1940": 2.9371,
+            "1950": 2.3924,
+            "1960": 1.9377,
+            "1970": 1.9796,
+            "1980": 0.8236,
+            "1990": 1.0139,
+            "2000": 1.8055,
+            "2010": 2.0606
+          },
+          "average": 1.8781
+        },
+        "Rain_Min_5-Day": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 0.0016,
+            "1910": 0.0054,
+            "1920": 0.0175,
+            "1930": 0.0091,
+            "1940": 0.1222,
+            "1950": 0.0289,
+            "1960": 1.4764,
+            "1970": 0.2301,
+            "1980": 0.0126,
+            "1990": 0.019,
+            "2000": 0.118,
+            "2010": 3.0421
+          },
+          "average": 0.4236
+        },
+        "Rain_Min_Day": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 0.0,
+            "1910": 0.0,
+            "1920": 0.0,
+            "1930": 0.0,
+            "1940": 0.0,
+            "1950": 0.0,
+            "1960": 0.0,
+            "1970": 0.0,
+            "1980": 0.0,
+            "1990": 0.0,
+            "2000": 0.0,
+            "2010": 0.0
+          },
+          "average": 0.0
+        },
+        "Rain_R10mm": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 1.5254,
+            "1910": 3.6216,
+            "1920": 1.4667,
+            "1930": 2.2558,
+            "1940": 2.9048,
+            "1950": 1.6184,
+            "1960": 1.9412,
+            "1970": 3.6364,
+            "1980": 1.1067,
+            "1990": 1.5217,
+            "2000": 1.3895,
+            "2010": 1.5581
+          },
+          "average": 2.0455
+        },
+        "Rain_R20mm": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 2.1905,
+            "1910": 4.6923,
+            "1920": 1.963,
+            "1930": 2.6471,
+            "1940": 5.9091,
+            "1950": 2.5217,
+            "1960": 4.0,
+            "1970": 3.619,
+            "1980": 1.5909,
+            "1990": 2.3636,
+            "2000": 1.7805,
+            "2010": 2.6
+          },
+          "average": 2.9898
+        },
+        "Rain_Total": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 1.5139,
+            "1910": 3.0138,
+            "1920": 1.5,
+            "1930": 1.525,
+            "1940": 2.7608,
+            "1950": 1.7594,
+            "1960": 1.9002,
+            "1970": 2.5739,
+            "1980": 1.0681,
+            "1990": 1.4021,
+            "2000": 1.4154,
+            "2010": 1.5684
+          },
+          "average": 1.8334
+        },
+        "Temp_5-Day_Avg_Max": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": -1.9371,
+            "1860": -1.9371,
+            "1870": -1.9371,
+            "1880": -1.9371,
+            "1890": -1.9371,
+            "1900": -1.9371,
+            "1910": -1.9371,
+            "1920": 0.1232,
+            "1930": 0.3726,
+            "1940": -1.2247,
+            "1950": -1.8786,
+            "1960": -0.9428,
+            "1970": -1.6006,
+            "1980": -0.7557,
+            "1990": 0.0809,
+            "2000": -1.9665,
+            "2010": -1.6129
+          },
+          "average": -1.3509
+        },
+        "Temp_5-Day_Avg_Min": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": -0.9212,
+            "1860": -0.9212,
+            "1870": -0.9212,
+            "1880": -0.9212,
+            "1890": -0.9212,
+            "1900": -0.9212,
+            "1910": -0.9212,
+            "1920": -0.5015,
+            "1930": -1.2397,
+            "1940": -1.3532,
+            "1950": -0.7969,
+            "1960": -0.7131,
+            "1970": -1.1921,
+            "1980": -0.7845,
+            "1990": -1.1851,
+            "2000": -1.1895,
+            "2010": -1.2218
+          },
+          "average": -0.978
+        },
+        "Temp_Average": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": -1.1497,
+            "1860": -1.1497,
+            "1870": -1.1497,
+            "1880": -1.1497,
+            "1890": -1.1497,
+            "1900": -1.1497,
+            "1910": -1.1497,
+            "1920": 0.2363,
+            "1930": -0.1229,
+            "1940": -0.6243,
+            "1950": -0.6596,
+            "1960": -0.5385,
+            "1970": -0.4888,
+            "1980": 0.4851,
+            "1990": -0.0113,
+            "2000": -0.3007,
+            "2010": -0.2876
+          },
+          "average": -0.6094
+        },
+        "Temp_Avg_Max": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": -1.5126,
+            "1860": -1.5126,
+            "1870": -1.5126,
+            "1880": -1.5126,
+            "1890": -1.5126,
+            "1900": -1.5126,
+            "1910": -1.5126,
+            "1920": 0.3592,
+            "1930": -0.2834,
+            "1940": -0.9395,
+            "1950": -0.6394,
+            "1960": -0.7827,
+            "1970": -0.9919,
+            "1980": 0.6664,
+            "1990": 0.0781,
+            "2000": -0.1782,
+            "2010": 0.038
+          },
+          "average": -0.7801
+        },
+        "Temp_Avg_Min": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": -1.5235,
+            "1860": -1.5235,
+            "1870": -1.5235,
+            "1880": -1.5235,
+            "1890": -1.5235,
+            "1900": -1.5235,
+            "1910": -1.5235,
+            "1920": -0.563,
+            "1930": -0.7358,
+            "1940": -1.0471,
+            "1950": -1.4413,
+            "1960": -1.02,
+            "1970": -0.8084,
+            "1980": -0.491,
+            "1990": -0.8141,
+            "2000": -1.213,
+            "2010": -1.3555
+          },
+          "average": -1.1855
+        },
+        "Temp_Max_Day": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": -2.4867,
+            "1860": -2.4867,
+            "1870": -2.4867,
+            "1880": -2.4867,
+            "1890": -2.4867,
+            "1900": -2.4867,
+            "1910": -2.4867,
+            "1920": -0.1386,
+            "1930": 0.9394,
+            "1940": -1.0544,
+            "1950": -2.8534,
+            "1960": -0.6143,
+            "1970": -2.0332,
+            "1980": -0.7222,
+            "1990": -0.0972,
+            "2000": -2.2611,
+            "2010": -2.0677
+          },
+          "average": -1.6653
+        },
+        "Temp_Min_Day": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": -1.547,
+            "1860": -1.547,
+            "1870": -1.547,
+            "1880": -1.547,
+            "1890": -1.547,
+            "1900": -1.547,
+            "1910": -1.547,
+            "1920": -0.0207,
+            "1930": -1.303,
+            "1940": -1.7823,
+            "1950": -0.8518,
+            "1960": -1.0012,
+            "1970": -1.3955,
+            "1980": -0.6754,
+            "1990": -0.8275,
+            "2000": -1.1,
+            "2010": -1.5838
+          },
+          "average": -1.2571
+        }
+      },
+      "MAM": {
+        "Humidity_Average": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1970-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1970": -7.2654,
+            "1980": -6.0398,
+            "1990": -7.4257,
+            "2000": -6.6493,
+            "2010": -1.9046
+          },
+          "average": -5.857
+        },
+        "Rain_CDD": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 1.5344,
+            "1910": 1.0625,
+            "1920": 2.5397,
+            "1930": 2.0601,
+            "1940": 1.6552,
+            "1950": 1.3393,
+            "1960": 1.559,
+            "1970": 1.3385,
+            "1980": 1.0676,
+            "1990": 1.4747,
+            "2000": 1.4019,
+            "2010": 0.9894
+          },
+          "average": 1.5019
+        },
+        "Rain_Max_5-Day": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 1.1699,
+            "1910": 1.3495,
+            "1920": 1.0393,
+            "1930": 0.7893,
+            "1940": 2.1082,
+            "1950": 1.5829,
+            "1960": 0.9222,
+            "1970": 1.0722,
+            "1980": 1.1242,
+            "1990": 0.8763,
+            "2000": 0.9215,
+            "2010": 2.0276
+          },
+          "average": 1.2486
+        },
+        "Rain_Max_Day": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 1.1103,
+            "1910": 1.3972,
+            "1920": 1.0833,
+            "1930": 0.8456,
+            "1940": 2.0959,
+            "1950": 1.3756,
+            "1960": 0.7902,
+            "1970": 1.0598,
+            "1980": 1.4998,
+            "1990": 1.0602,
+            "2000": 0.7646,
+            "2010": 2.1666
+          },
+          "average": 1.2708
+        },
+        "Rain_Min_5-Day": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 0.0,
+            "1910": 0.0,
+            "1920": 0.0,
+            "1930": 0.0038,
+            "1940": 0.0087,
+            "1950": 0.0522,
+            "1960": 0.0,
+            "1970": 0.0,
+            "1980": 0.0016,
+            "1990": 0.002,
+            "2000": 0.0829,
+            "2010": 0.0024
+          },
+          "average": 0.0128
+        },
+        "Rain_Min_Day": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 0.0,
+            "1910": 0.0,
+            "1920": 0.0,
+            "1930": 0.0,
+            "1940": 0.0,
+            "1950": 0.0,
+            "1960": 0.0,
+            "1970": 0.0,
+            "1980": 0.0,
+            "1990": 0.0,
+            "2000": 0.0,
+            "2010": 0.0
+          },
+          "average": 0.0
+        },
+        "Rain_R10mm": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 0.8571,
+            "1910": 1.3333,
+            "1920": 0.8431,
+            "1930": 0.5574,
+            "1940": 0.8462,
+            "1950": 1.2353,
+            "1960": 0.8475,
+            "1970": 1.093,
+            "1980": 1.0,
+            "1990": 0.766,
+            "2000": 0.8108,
+            "2010": 1.75
+          },
+          "average": 0.995
+        },
+        "Rain_R20mm": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 1.9091,
+            "1910": 1.6667,
+            "1920": 1.4,
+            "1930": 0.8095,
+            "1940": 1.375,
+            "1950": 1.5833,
+            "1960": 1.1364,
+            "1970": 1.3529,
+            "1980": 1.4375,
+            "1990": 1.2,
+            "2000": 0.8333,
+            "2010": 2.3333
+          },
+          "average": 1.4197
+        },
+        "Rain_Total": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 0.929,
+            "1910": 1.1246,
+            "1920": 0.7318,
+            "1930": 0.5079,
+            "1940": 1.0137,
+            "1950": 1.1278,
+            "1960": 0.722,
+            "1970": 0.8526,
+            "1980": 1.0493,
+            "1990": 0.7971,
+            "2000": 0.6184,
+            "2010": 1.445
+          },
+          "average": 0.9099
+        },
+        "Temp_5-Day_Avg_Max": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": -1.2295,
+            "1860": -1.2295,
+            "1870": -1.2295,
+            "1880": -1.2295,
+            "1890": -1.2295,
+            "1900": -1.2295,
+            "1910": -1.2295,
+            "1920": -0.3522,
+            "1930": -0.1379,
+            "1940": 0.1798,
+            "1950": -0.1027,
+            "1960": -1.2428,
+            "1970": 0.4872,
+            "1980": -0.8215,
+            "1990": 0.758,
+            "2000": -0.6788,
+            "2010": -1.8817
+          },
+          "average": -0.7294
+        },
+        "Temp_5-Day_Avg_Min": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": -5.2355,
+            "1860": -5.2355,
+            "1870": -5.2355,
+            "1880": -5.2355,
+            "1890": -5.2355,
+            "1900": -5.2355,
+            "1910": -5.2355,
+            "1920": -2.2964,
+            "1930": -0.409,
+            "1940": -0.5303,
+            "1950": -2.8893,
+            "1960": -3.8678,
+            "1970": -2.7621,
+            "1980": -0.756,
+            "1990": -2.3628,
+            "2000": -2.7072,
+            "2010": -5.2999
+          },
+          "average": -3.5605
+        },
+        "Temp_Average": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": -0.9526,
+            "1860": -0.9526,
+            "1870": -0.9526,
+            "1880": -0.9526,
+            "1890": -0.9526,
+            "1900": -0.9526,
+            "1910": -0.9526,
+            "1920": -0.3268,
+            "1930": -0.162,
+            "1940": -0.4824,
+            "1950": -0.1647,
+            "1960": -0.3177,
+            "1970": -0.1474,
+            "1980": -0.0878,
+            "1990": -0.006,
+            "2000": -0.4839,
+            "2010": -1.5236
+          },
+          "average": -0.61
+        },
+        "Temp_Avg_Max": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": 0.2377,
+            "1860": 0.2377,
+            "1870": 0.2377,
+            "1880": 0.2377,
+            "1890": 0.2377,
+            "1900": 0.2377,
+            "1910": 0.2377,
+            "1920": 1.129,
+            "1930": 1.1599,
+            "1940": 0.872,
+            "1950": 1.094,
+            "1960": 1.1668,
+            "1970": 1.0178,
+            "1980": 0.7858,
+            "1990": 1.5024,
+            "2000": 1.1003,
+            "2010": -0.5157
+          },
+          "average": 0.6457
+        },
+        "Temp_Avg_Min": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": -2.6824,
+            "1860": -2.6824,
+            "1870": -2.6824,
+            "1880": -2.6824,
+            "1890": -2.6824,
+            "1900": -2.6824,
+            "1910": -2.6824,
+            "1920": -2.4285,
+            "1930": -2.1357,
+            "1940": -2.4274,
+            "1950": -2.0678,
+            "1960": -2.4787,
+            "1970": -1.965,
+            "1980": -1.5783,
+            "1990": -2.1352,
+            "2000": -2.6657,
+            "2010": -3.1336
+          },
+          "average": -2.4584
+        },
+        "Temp_Max_Day": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": -0.1505,
+            "1860": -0.1505,
+            "1870": -0.1505,
+            "1880": -0.1505,
+            "1890": -0.1505,
+            "1900": -0.1505,
+            "1910": -0.1505,
+            "1920": -0.1954,
+            "1930": -0.0221,
+            "1940": 0.0986,
+            "1950": -0.5711,
+            "1960": -2.0623,
+            "1970": -0.1007,
+            "1980": -1.2337,
+            "1990": 0.6967,
+            "2000": -1.2619,
+            "2010": -2.377
+          },
+          "average": -0.4754
+        },
+        "Temp_Min_Day": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": -4.8118,
+            "1860": -4.8118,
+            "1870": -4.8118,
+            "1880": -4.8118,
+            "1890": -4.8118,
+            "1900": -4.8118,
+            "1910": -4.8118,
+            "1920": -2.0364,
+            "1930": 0.296,
+            "1940": -0.3545,
+            "1950": -3.875,
+            "1960": -3.6999,
+            "1970": -2.366,
+            "1980": -0.496,
+            "1990": -2.4546,
+            "2000": -2.6153,
+            "2010": -6.4486
+          },
+          "average": -3.3961
+        }
+      },
+      "JJA": {
+        "Humidity_Average": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1970-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1970": -30.0019,
+            "1980": -29.2424,
+            "1990": -29.6987,
+            "2000": -28.746,
+            "2010": -26.7076
+          },
+          "average": -28.8793
+        },
+        "Rain_CDD": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": true,
+          "slope_per_decade": -0.074807,
+          "decades": {
+            "1900": 2.5196,
+            "1910": 1.6916,
+            "1920": 1.8382,
+            "1930": 1.7218,
+            "1940": 1.8246,
+            "1950": 1.2559,
+            "1960": 1.5879,
+            "1970": 2.0206,
+            "1980": 1.6722,
+            "1990": 0.9912,
+            "2000": 1.2857,
+            "2010": 1.3846
+          },
+          "average": 1.6495
+        },
+        "Rain_Max_5-Day": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 0.436,
+            "1910": 1.2432,
+            "1920": 1.7512,
+            "1930": 0.9575,
+            "1940": 0.7558,
+            "1950": 0.819,
+            "1960": 0.6092,
+            "1970": 0.4215,
+            "1980": 1.1041,
+            "1990": 1.1112,
+            "2000": 1.3001,
+            "2010": 0.9455
+          },
+          "average": 0.9545
+        },
+        "Rain_Max_Day": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 0.5354,
+            "1910": 1.3328,
+            "1920": 2.1966,
+            "1930": 1.0781,
+            "1940": 0.7383,
+            "1950": 0.8515,
+            "1960": 0.7144,
+            "1970": 0.5836,
+            "1980": 0.9519,
+            "1990": 1.1885,
+            "2000": 1.3112,
+            "2010": 0.9932
+          },
+          "average": 1.0396
+        },
+        "Rain_Min_5-Day": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 0.0,
+            "1910": 0.0,
+            "1920": 0.0,
+            "1930": 0.0,
+            "1940": 0.0,
+            "1950": 0.0,
+            "1960": 0.0,
+            "1970": 0.0,
+            "1980": 0.0,
+            "1990": 0.0,
+            "2000": 0.0106,
+            "2010": 0.0
+          },
+          "average": 0.0009
+        },
+        "Rain_Min_Day": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 0.0,
+            "1910": 0.0,
+            "1920": 0.0,
+            "1930": 0.0,
+            "1940": 0.0,
+            "1950": 0.0,
+            "1960": 0.0,
+            "1970": 0.0,
+            "1980": 0.0,
+            "1990": 0.0,
+            "2000": 0.0,
+            "2010": 0.0
+          },
+          "average": 0.0
+        },
+        "Rain_R10mm": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 0.3684,
+            "1910": 1.1875,
+            "1920": 1.08,
+            "1930": 0.76,
+            "1940": 0.7222,
+            "1950": 0.7692,
+            "1960": 0.5417,
+            "1970": 0.4286,
+            "1980": 0.9412,
+            "1990": 0.8824,
+            "2000": 1.3571,
+            "2010": 0.7778
+          },
+          "average": 0.818
+        },
+        "Rain_R20mm": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 0.1667,
+            "1910": 4.0,
+            "1920": 2.125,
+            "1930": 1.2857,
+            "1940": 0.6,
+            "1950": 1.2222,
+            "1960": 0.5455,
+            "1970": 0.375,
+            "1980": 1.5,
+            "1990": 0.8571,
+            "2000": 2.2,
+            "2010": 0.2857
+          },
+          "average": 1.2636
+        },
+        "Rain_Total": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 0.2706,
+            "1910": 0.9065,
+            "1920": 0.9793,
+            "1930": 0.7357,
+            "1940": 0.5171,
+            "1950": 0.6504,
+            "1960": 0.4144,
+            "1970": 0.3355,
+            "1980": 0.7462,
+            "1990": 0.8146,
+            "2000": 1.0654,
+            "2010": 0.6037
+          },
+          "average": 0.67
+        },
+        "Temp_5-Day_Avg_Max": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": 1.0635,
+            "1860": 1.0635,
+            "1870": 1.0635,
+            "1880": 1.0635,
+            "1890": 1.0635,
+            "1900": 1.0635,
+            "1910": 1.0635,
+            "1920": 1.4024,
+            "1930": 1.4293,
+            "1940": 1.8486,
+            "1950": 1.4022,
+            "1960": 2.5062,
+            "1970": 1.9087,
+            "1980": 0.51,
+            "1990": 2.3335,
+            "2000": 1.7624,
+            "2010": -0.5275
+          },
+          "average": 1.2953
+        },
+        "Temp_5-Day_Avg_Min": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": -1.2956,
+            "1860": -1.2956,
+            "1870": -1.2956,
+            "1880": -1.2956,
+            "1890": -1.2956,
+            "1900": -1.2956,
+            "1910": -1.2956,
+            "1920": -1.3995,
+            "1930": -1.4707,
+            "1940": -1.5475,
+            "1950": -0.993,
+            "1960": -2.3888,
+            "1970": -2.3655,
+            "1980": -1.7388,
+            "1990": -1.0854,
+            "2000": -2.4893,
+            "2010": -1.6921
+          },
+          "average": -1.5435
+        },
+        "Temp_Average": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": -0.1505,
+            "1860": -0.1505,
+            "1870": -0.1505,
+            "1880": -0.1505,
+            "1890": -0.1505,
+            "1900": -0.1505,
+            "1910": -0.1505,
+            "1920": 0.7265,
+            "1930": 0.2871,
+            "1940": 0.5815,
+            "1950": 0.5898,
+            "1960": 0.3393,
+            "1970": 0.7282,
+            "1980": 0.3378,
+            "1990": 0.9651,
+            "2000": 0.1029,
+            "2010": -0.3242
+          },
+          "average": 0.193
+        },
+        "Temp_Avg_Max": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": 1.8489,
+            "1860": 1.8489,
+            "1870": 1.8489,
+            "1880": 1.8489,
+            "1890": 1.8489,
+            "1900": 1.8489,
+            "1910": 1.8489,
+            "1920": 2.6449,
+            "1930": 1.9862,
+            "1940": 2.4294,
+            "1950": 2.6804,
+            "1960": 2.5947,
+            "1970": 3.0684,
+            "1980": 1.8758,
+            "1990": 2.7476,
+            "2000": 2.0236,
+            "2010": 1.7711
+          },
+          "average": 2.1626
+        },
+        "Temp_Avg_Min": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": -2.5625,
+            "1860": -2.5625,
+            "1870": -2.5625,
+            "1880": -2.5625,
+            "1890": -2.5625,
+            "1900": -2.5625,
+            "1910": -2.5625,
+            "1920": -1.6795,
+            "1930": -1.9903,
+            "1940": -1.7139,
+            "1950": -2.0592,
+            "1960": -2.4137,
+            "1970": -2.1612,
+            "1980": -1.6835,
+            "1990": -1.2301,
+            "2000": -2.2325,
+            "2010": -2.8545
+          },
+          "average": -2.2327
+        },
+        "Temp_Max_Day": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": 1.0283,
+            "1860": 1.0283,
+            "1870": 1.0283,
+            "1880": 1.0283,
+            "1890": 1.0283,
+            "1900": 1.0283,
+            "1910": 1.0283,
+            "1920": 1.1494,
+            "1930": 1.4354,
+            "1940": 1.5947,
+            "1950": 1.5128,
+            "1960": 2.4096,
+            "1970": 1.4704,
+            "1980": 0.1236,
+            "1990": 1.6529,
+            "2000": 1.0567,
+            "2010": -1.2043
+          },
+          "average": 1.0823
+        },
+        "Temp_Min_Day": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": true,
+          "slope_per_decade": -0.14384,
+          "decades": {
+            "1850": -0.9271,
+            "1860": -1.071,
+            "1870": -1.2148,
+            "1880": -1.3586,
+            "1890": -1.5025,
+            "1900": -1.6463,
+            "1910": -1.7902,
+            "1920": -1.6158,
+            "1930": -1.6361,
+            "1940": -2.0302,
+            "1950": -1.7616,
+            "1960": -2.712,
+            "1970": -2.7405,
+            "1980": -2.5544,
+            "1990": -1.9683,
+            "2000": -3.5937,
+            "2010": -2.7676
+          },
+          "average": -1.9347
+        },
+        "VPD_Average": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1970-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1970": 0.5909,
+            "1980": 0.5682,
+            "1990": 0.5993,
+            "2000": 0.5631,
+            "2010": 0.5091
+          },
+          "average": 0.5661
+        }
+      },
+      "SON": {
+        "Humidity_Average": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1970-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1970": -14.1535,
+            "1980": -12.1616,
+            "1990": -11.8779,
+            "2000": -13.8241,
+            "2010": -12.0239
+          },
+          "average": -12.8082
+        },
+        "Rain_CDD": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 1.0074,
+            "1910": 1.2676,
+            "1920": 1.0707,
+            "1930": 0.9615,
+            "1940": 1.2799,
+            "1950": 1.4842,
+            "1960": 0.8075,
+            "1970": 1.3436,
+            "1980": 1.1,
+            "1990": 1.0227,
+            "2000": 0.9114,
+            "2010": 1.1287
+          },
+          "average": 1.1154
+        },
+        "Rain_Max_5-Day": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 0.9025,
+            "1910": 1.2212,
+            "1920": 1.0199,
+            "1930": 1.105,
+            "1940": 0.9666,
+            "1950": 2.399,
+            "1960": 1.5585,
+            "1970": 2.1795,
+            "1980": 1.4842,
+            "1990": 2.6448,
+            "2000": 1.0738,
+            "2010": 0.5311
+          },
+          "average": 1.4238
+        },
+        "Rain_Max_Day": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 0.9894,
+            "1910": 1.2533,
+            "1920": 1.0294,
+            "1930": 1.2224,
+            "1940": 1.3752,
+            "1950": 1.8116,
+            "1960": 1.7308,
+            "1970": 1.9191,
+            "1980": 1.4776,
+            "1990": 1.8033,
+            "2000": 1.1949,
+            "2010": 0.6876
+          },
+          "average": 1.3746
+        },
+        "Rain_Min_5-Day": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": true,
+          "slope_per_decade": 0.00303,
+          "decades": {
+            "1900": 0.0,
+            "1910": 0.0,
+            "1920": 0.0,
+            "1930": 0.0,
+            "1940": 0.0,
+            "1950": 0.0,
+            "1960": 0.0,
+            "1970": 0.0,
+            "1980": 0.0,
+            "1990": 0.0,
+            "2000": 0.0337,
+            "2010": 0.0513
+          },
+          "average": 0.0071
+        },
+        "Rain_Min_Day": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 0.0,
+            "1910": 0.0,
+            "1920": 0.0,
+            "1940": 0.0,
+            "1950": 0.0,
+            "1960": 0.0,
+            "1970": 0.0,
+            "1980": 0.0,
+            "2000": 0.0,
+            "2010": 0.0
+          },
+          "average": 0.0
+        },
+        "Rain_R10mm": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 1.1875,
+            "1910": 1.1429,
+            "1920": 1.5333,
+            "1930": 1.1667,
+            "1940": 2.2,
+            "1950": 2.7143,
+            "1960": 2.4286,
+            "1970": 2.3846,
+            "1980": 1.4444,
+            "1990": 3.0,
+            "2000": 2.25,
+            "2010": 0.65
+          },
+          "average": 1.8419
+        },
+        "Rain_R20mm": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 1.0,
+            "1910": 1.7143,
+            "1920": 1.1667,
+            "1930": 3.0,
+            "1940": 1.5,
+            "1950": 0.75,
+            "1970": 5.0,
+            "1980": 1.2,
+            "1990": 8.0,
+            "2000": 2.0,
+            "2010": 0.6667
+          },
+          "average": 2.3634
+        },
+        "Rain_Total": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 0.9361,
+            "1910": 1.0025,
+            "1920": 0.9826,
+            "1930": 1.1948,
+            "1940": 1.1716,
+            "1950": 1.8419,
+            "1960": 1.6757,
+            "1970": 1.4884,
+            "1980": 1.4381,
+            "1990": 1.6582,
+            "2000": 1.2774,
+            "2010": 0.6128
+          },
+          "average": 1.2733
+        },
+        "Temp_5-Day_Avg_Max": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": -0.1986,
+            "1860": -0.1986,
+            "1870": -0.1986,
+            "1880": -0.1986,
+            "1890": -0.1986,
+            "1900": -0.1986,
+            "1910": -0.1986,
+            "1920": -0.6057,
+            "1930": -1.0819,
+            "1940": -0.7302,
+            "1950": 0.0324,
+            "1960": 0.4959,
+            "1970": -0.2559,
+            "1980": -0.7588,
+            "1990": 0.2123,
+            "2000": -0.1795,
+            "2010": -1.6176
+          },
+          "average": -0.3458
+        },
+        "Temp_5-Day_Avg_Min": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": -1.1075,
+            "1860": -1.1075,
+            "1870": -1.1075,
+            "1880": -1.1075,
+            "1890": -1.1075,
+            "1900": -1.1075,
+            "1910": -1.1075,
+            "1920": -1.4121,
+            "1930": -0.5347,
+            "1940": -1.5943,
+            "1950": -2.1104,
+            "1960": -0.8164,
+            "1970": -1.4162,
+            "1980": -1.2363,
+            "1990": -0.8276,
+            "2000": -1.7988,
+            "2010": -1.4509
+          },
+          "average": -1.2324
+        },
+        "Temp_Average": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": -0.4841,
+            "1860": -0.4841,
+            "1870": -0.4841,
+            "1880": -0.4841,
+            "1890": -0.4841,
+            "1900": -0.4841,
+            "1910": -0.4841,
+            "1920": 0.1273,
+            "1930": -0.2448,
+            "1940": -0.3721,
+            "1950": -0.0637,
+            "1960": 0.469,
+            "1970": 0.6703,
+            "1980": 0.3715,
+            "1990": 0.4191,
+            "2000": 0.3106,
+            "2010": -0.1614
+          },
+          "average": -0.1096
+        },
+        "Temp_Avg_Max": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": 0.6233,
+            "1860": 0.6233,
+            "1870": 0.6233,
+            "1880": 0.6233,
+            "1890": 0.6233,
+            "1900": 0.6233,
+            "1910": 0.6233,
+            "1920": 0.9989,
+            "1930": 0.3229,
+            "1940": 0.5538,
+            "1950": 0.893,
+            "1960": 1.5056,
+            "1970": 1.3743,
+            "1980": 1.0357,
+            "1990": 1.0743,
+            "2000": 1.3401,
+            "2010": 1.0081
+          },
+          "average": 0.8512
+        },
+        "Temp_Avg_Min": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": -1.8276,
+            "1860": -1.8276,
+            "1870": -1.8276,
+            "1880": -1.8276,
+            "1890": -1.8276,
+            "1900": -1.8276,
+            "1910": -1.8276,
+            "1920": -0.904,
+            "1930": -0.9499,
+            "1940": -1.4896,
+            "1950": -1.2191,
+            "1960": -0.7098,
+            "1970": -0.2658,
+            "1980": -0.5914,
+            "1990": -0.4482,
+            "2000": -1.0076,
+            "2010": -1.7928
+          },
+          "average": -1.3042
+        },
+        "Temp_Max_Day": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": -0.4091,
+            "1860": -0.4091,
+            "1870": -0.4091,
+            "1880": -0.4091,
+            "1890": -0.4091,
+            "1900": -0.4091,
+            "1910": -0.4091,
+            "1920": -0.3343,
+            "1930": -1.042,
+            "1940": -0.7226,
+            "1950": 0.2872,
+            "1960": 0.1523,
+            "1970": -0.2365,
+            "1980": -0.5659,
+            "1990": 0.131,
+            "2000": -0.289,
+            "2010": -1.7016
+          },
+          "average": -0.4227
+        },
+        "Temp_Min_Day": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": -0.961,
+            "1860": -0.961,
+            "1870": -0.961,
+            "1880": -0.961,
+            "1890": -0.961,
+            "1900": -0.961,
+            "1910": -0.961,
+            "1920": -1.057,
+            "1930": -0.3048,
+            "1940": -1.7427,
+            "1950": -2.1175,
+            "1960": -0.7819,
+            "1970": -2.232,
+            "1980": -0.9255,
+            "1990": -1.1868,
+            "2000": -2.1232,
+            "2010": -1.2906
+          },
+          "average": -1.2052
+        }
+      },
+      "Annual": {
+        "Humidity_Average": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1970-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1970": -11.11,
+            "1980": -11.0286,
+            "1990": -10.7271,
+            "2000": -10.649,
+            "2010": -8.6941
+          },
+          "average": -10.4418
+        },
+        "Rain_CDD": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 1.8537,
+            "1910": 1.4345,
+            "1920": 1.4547,
+            "1930": 1.4971,
+            "1940": 1.7787,
+            "1950": 1.5976,
+            "1960": 1.0877,
+            "1970": 1.9718,
+            "1980": 1.425,
+            "1990": 0.9296,
+            "2000": 1.0639,
+            "2010": 1.302
+          },
+          "average": 1.4497
+        },
+        "Rain_Max_5-Day": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 1.5169,
+            "1910": 1.9518,
+            "1920": 1.4297,
+            "1930": 1.2769,
+            "1940": 2.165,
+            "1950": 1.7547,
+            "1960": 1.226,
+            "1970": 1.6508,
+            "1980": 1.0553,
+            "1990": 1.1476,
+            "2000": 1.5007,
+            "2010": 1.7963
+          },
+          "average": 1.5393
+        },
+        "Rain_Max_Day": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 1.3713,
+            "1910": 1.8785,
+            "1920": 1.6017,
+            "1930": 1.0314,
+            "1940": 2.2133,
+            "1950": 1.9902,
+            "1960": 1.0306,
+            "1970": 1.6031,
+            "1980": 0.9508,
+            "1990": 1.1092,
+            "2000": 1.4381,
+            "2010": 1.9099
+          },
+          "average": 1.5107
+        },
+        "Rain_Min_5-Day": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 0.0,
+            "1910": 0.0,
+            "1920": 0.0,
+            "1930": 0.0,
+            "1940": 0.0,
+            "1950": 0.0,
+            "1960": 0.0,
+            "1970": 0.0,
+            "1980": 0.0,
+            "1990": 0.0,
+            "2000": 0.0,
+            "2010": 0.0
+          },
+          "average": 0.0
+        },
+        "Rain_Min_Day": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1910-1989",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1910": 0.0,
+            "1920": 0.0,
+            "1970": 0.0,
+            "1980": 0.0
+          },
+          "average": 0.0
+        },
+        "Rain_R10mm": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 1.0645,
+            "1910": 1.9211,
+            "1920": 1.2716,
+            "1930": 1.1429,
+            "1940": 1.605,
+            "1950": 1.4591,
+            "1960": 1.2429,
+            "1970": 1.9302,
+            "1980": 1.1062,
+            "1990": 1.2708,
+            "2000": 1.3026,
+            "2010": 1.3261
+          },
+          "average": 1.3869
+        },
+        "Rain_R20mm": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 1.58,
+            "1910": 2.7568,
+            "1920": 1.7679,
+            "1930": 1.617,
+            "1940": 2.7353,
+            "1950": 1.8833,
+            "1960": 1.7955,
+            "1970": 2.34,
+            "1980": 1.5417,
+            "1990": 1.8696,
+            "2000": 1.6167,
+            "2010": 1.5312
+          },
+          "average": 1.9196
+        },
+        "Rain_Total": {
+          "type": "multiplicative",
+          "time_varying": true,
+          "validation_period": "1900-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1900": 0.9906,
+            "1910": 1.6144,
+            "1920": 1.1294,
+            "1930": 0.9457,
+            "1940": 1.4806,
+            "1950": 1.3984,
+            "1960": 1.0579,
+            "1970": 1.4319,
+            "1980": 1.0621,
+            "1990": 1.1533,
+            "2000": 1.1499,
+            "2010": 1.1886
+          },
+          "average": 1.2169
+        },
+        "Temp_5-Day_Avg_Max": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": -1.3719,
+            "1860": -1.3719,
+            "1870": -1.3719,
+            "1880": -1.3719,
+            "1890": -1.3719,
+            "1900": -1.3719,
+            "1910": -1.3719,
+            "1920": -0.242,
+            "1930": -0.2738,
+            "1940": -1.6344,
+            "1950": -1.7427,
+            "1960": -0.6827,
+            "1970": -1.5511,
+            "1980": -0.5409,
+            "1990": -0.1511,
+            "2000": -1.0092,
+            "2010": -1.4102
+          },
+          "average": -1.1083
+        },
+        "Temp_5-Day_Avg_Min": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": -1.3467,
+            "1860": -1.3467,
+            "1870": -1.3467,
+            "1880": -1.3467,
+            "1890": -1.3467,
+            "1900": -1.3467,
+            "1910": -1.3467,
+            "1920": -1.3995,
+            "1930": -1.4707,
+            "1940": -1.4417,
+            "1950": -1.108,
+            "1960": -2.3888,
+            "1970": -2.3655,
+            "1980": -1.7388,
+            "1990": -1.0854,
+            "2000": -2.5265,
+            "2010": -1.6921
+          },
+          "average": -1.5673
+        },
+        "Temp_Average": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": -0.6576,
+            "1860": -0.6576,
+            "1870": -0.6576,
+            "1880": -0.6576,
+            "1890": -0.6576,
+            "1900": -0.6576,
+            "1910": -0.6576,
+            "1920": 0.186,
+            "1930": -0.0558,
+            "1940": -0.2303,
+            "1950": -0.0754,
+            "1960": 0.0027,
+            "1970": 0.1791,
+            "1980": 0.2547,
+            "1990": 0.3513,
+            "2000": -0.0728,
+            "2010": -0.586
+          },
+          "average": -0.2735
+        },
+        "Temp_Avg_Max": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": 0.3562,
+            "1860": 0.3562,
+            "1870": 0.3562,
+            "1880": 0.3562,
+            "1890": 0.3562,
+            "1900": 0.3562,
+            "1910": 0.3562,
+            "1920": 1.2787,
+            "1930": 0.8052,
+            "1940": 0.7307,
+            "1950": 0.9937,
+            "1960": 1.1493,
+            "1970": 1.1229,
+            "1980": 1.07,
+            "1990": 1.3643,
+            "2000": 1.0972,
+            "2010": 0.562
+          },
+          "average": 0.7451
+        },
+        "Temp_Avg_Min": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": -2.1473,
+            "1860": -2.1473,
+            "1870": -2.1473,
+            "1880": -2.1473,
+            "1890": -2.1473,
+            "1900": -2.1473,
+            "1910": -2.1473,
+            "1920": -1.4007,
+            "1930": -1.4556,
+            "1940": -1.6812,
+            "1950": -1.6877,
+            "1960": -1.6527,
+            "1970": -1.329,
+            "1980": -1.1057,
+            "1990": -1.1539,
+            "2000": -1.7615,
+            "2010": -2.2993
+          },
+          "average": -1.7976
+        },
+        "Temp_Max_Day": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": false,
+          "slope_per_decade": null,
+          "decades": {
+            "1850": -1.4862,
+            "1860": -1.4862,
+            "1870": -1.4862,
+            "1880": -1.4862,
+            "1890": -1.4862,
+            "1900": -1.4862,
+            "1910": -1.4862,
+            "1920": -0.2508,
+            "1930": 0.0523,
+            "1940": -1.7532,
+            "1950": -2.6435,
+            "1960": -0.4174,
+            "1970": -1.937,
+            "1980": -0.3461,
+            "1990": -0.1117,
+            "2000": -1.3159,
+            "2010": -1.6931
+          },
+          "average": -1.2247
+        },
+        "Temp_Min_Day": {
+          "type": "additive",
+          "time_varying": true,
+          "validation_period": "1910-2014",
+          "trend_significant": true,
+          "slope_per_decade": -0.142384,
+          "decades": {
+            "1850": -0.9679,
+            "1860": -1.1103,
+            "1870": -1.2527,
+            "1880": -1.395,
+            "1890": -1.5374,
+            "1900": -1.6798,
+            "1910": -1.8222,
+            "1920": -1.6158,
+            "1930": -1.6361,
+            "1940": -2.0302,
+            "1950": -1.7616,
+            "1960": -2.712,
+            "1970": -2.7405,
+            "1980": -2.5544,
+            "1990": -1.9683,
+            "2000": -3.5937,
+            "2010": -2.7676
+          },
+          "average": -1.9497
+        }
+      }
+    }
+  }
+}

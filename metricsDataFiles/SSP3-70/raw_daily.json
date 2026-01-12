@@ -1,0 +1,132 @@
+{
+  "model": "access_cm2",
+  "scenario": "SSP3-70",
+  "variant": "r1i1p1f1",
+  "calendar": "proleptic_gregorian",
+  "created": "2025-11-25T04:05:31.293487Z",
+  "time_range": [
+    "2015-01-01",
+    "2100-12-31"
+  ],
+  "ravenswood": {
+    "target": {
+      "lat": -20.115,
+      "lon": 146.9
+    },
+    "cell_centre": {
+      "lat": -20.625,
+      "lon": 147.1875
+    }
+  },
+  "parquet": {
+    "file": "raw_daily.parquet",
+    "rows": 31411,
+    "column_order": [
+      "tas_Australia_land_only_degC",
+      "tas_Ravenswood_degC",
+      "tasmax_Australia_land_only_degC",
+      "tasmax_Ravenswood_degC",
+      "tasmin_Australia_land_only_degC",
+      "tasmin_Ravenswood_degC",
+      "pr_Australia_land_only_mm_day",
+      "pr_Ravenswood_mm_day",
+      "sfcWind_Australia_land_only_ms",
+      "sfcWind_Ravenswood_ms",
+      "huss_Australia_land_only_g_per_kg",
+      "huss_Ravenswood_g_per_kg",
+      "psl_Australia_land_only_hPa",
+      "psl_Ravenswood_hPa"
+    ]
+  },
+  "date": {
+    "column": "time",
+    "format": "YYYY-MM-DD",
+    "freq": "D"
+  },
+  "data_layout": [
+    {
+      "name": "tas_Australia_land_only_degC",
+      "variable": "tas",
+      "region": "Australia",
+      "unit": "degC"
+    },
+    {
+      "name": "tas_Ravenswood_degC",
+      "variable": "tas",
+      "region": "Ravenswood",
+      "unit": "degC"
+    },
+    {
+      "name": "tasmax_Australia_land_only_degC",
+      "variable": "tasmax",
+      "region": "Australia",
+      "unit": "degC"
+    },
+    {
+      "name": "tasmax_Ravenswood_degC",
+      "variable": "tasmax",
+      "region": "Ravenswood",
+      "unit": "degC"
+    },
+    {
+      "name": "tasmin_Australia_land_only_degC",
+      "variable": "tasmin",
+      "region": "Australia",
+      "unit": "degC"
+    },
+    {
+      "name": "tasmin_Ravenswood_degC",
+      "variable": "tasmin",
+      "region": "Ravenswood",
+      "unit": "degC"
+    },
+    {
+      "name": "pr_Australia_land_only_mm_day",
+      "variable": "pr",
+      "region": "Australia",
+      "unit": "mm_day"
+    },
+    {
+      "name": "pr_Ravenswood_mm_day",
+      "variable": "pr",
+      "region": "Ravenswood",
+      "unit": "mm_day"
+    },
+    {
+      "name": "sfcWind_Australia_land_only_ms",
+      "variable": "sfcWind",
+      "region": "Australia",
+      "unit": "ms"
+    },
+    {
+      "name": "sfcWind_Ravenswood_ms",
+      "variable": "sfcWind",
+      "region": "Ravenswood",
+      "unit": "ms"
+    },
+    {
+      "name": "huss_Australia_land_only_g_per_kg",
+      "variable": "huss",
+      "region": "Australia",
+      "unit": "g_per_kg"
+    },
+    {
+      "name": "huss_Ravenswood_g_per_kg",
+      "variable": "huss",
+      "region": "Ravenswood",
+      "unit": "g_per_kg"
+    },
+    {
+      "name": "psl_Australia_land_only_hPa",
+      "variable": "psl",
+      "region": "Australia",
+      "unit": "hPa"
+    },
+    {
+      "name": "psl_Ravenswood_hPa",
+      "variable": "psl",
+      "region": "Ravenswood",
+      "unit": "hPa"
+    }
+  ]
+}

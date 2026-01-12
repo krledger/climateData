@@ -1,0 +1,105 @@
+{
+  "model": "AGCD",
+  "scenario": "AGCD",
+  "variant": "observations",
+  "calendar": "standard",
+  "created": "2025-11-27T07:44:16.422784Z",
+  "time_range": [
+    "1900-01-01",
+    "2024-12-31"
+  ],
+  "ravenswood": {
+    "target": {
+      "lat": -20.115,
+      "lon": 146.9
+    },
+    "cell_centre": {
+      "lat": -20.1,
+      "lon": 146.9
+    }
+  },
+  "parquet": {
+    "file": "raw_daily.parquet",
+    "rows": 45656,
+    "column_order": [
+      "tasmax_Australia_land_only_degC",
+      "tasmax_Ravenswood_degC",
+      "tasmin_Australia_land_only_degC",
+      "tasmin_Ravenswood_degC",
+      "pr_Australia_land_only_mm_day",
+      "pr_Ravenswood_mm_day",
+      "vprp09_Australia_land_only_hPa",
+      "vprp09_Ravenswood_hPa",
+      "tas_Australia_land_only_degC",
+      "tas_Ravenswood_degC"
+    ]
+  },
+  "date": {
+    "column": "time",
+    "format": "YYYY-MM-DD",
+    "freq": "D"
+  },
+  "data_layout": [
+    {
+      "name": "tasmax_Australia_land_only_degC",
+      "variable": "tasmax",
+      "region": "Australia",
+      "unit": "degC"
+    },
+    {
+      "name": "tasmax_Ravenswood_degC",
+      "variable": "tasmax",
+      "region": "Ravenswood",
+      "unit": "degC"
+    },
+    {
+      "name": "tasmin_Australia_land_only_degC",
+      "variable": "tasmin",
+      "region": "Australia",
+      "unit": "degC"
+    },
+    {
+      "name": "tasmin_Ravenswood_degC",
+      "variable": "tasmin",
+      "region": "Ravenswood",
+      "unit": "degC"
+    },
+    {
+      "name": "pr_Australia_land_only_mm_day",
+      "variable": "pr",
+      "region": "Australia",
+      "unit": "mm_day"
+    },
+    {
+      "name": "pr_Ravenswood_mm_day",
+      "variable": "pr",
+      "region": "Ravenswood",
+      "unit": "mm_day"
+    },
+    {
+      "name": "vprp09_Australia_land_only_hPa",
+      "variable": "vprp09",
+      "region": "Australia",
+      "unit": "hPa"
+    },
+    {
+      "name": "vprp09_Ravenswood_hPa",
+      "variable": "vprp09",
+      "region": "Ravenswood",
+      "unit": "hPa"
+    },
+    {
+      "name": "tas_Australia_land_only_degC",
+      "variable": "tas",
+      "region": "Australia",
+      "unit": "degC"
+    },
+    {
+      "name": "tas_Ravenswood_degC",
+      "variable": "tas",
+      "region": "Ravenswood",
+      "unit": "degC"
+    }
+  ],
+  "notes": "UNION join used - each variable has its full date range, NaN where data unavailable"
+}

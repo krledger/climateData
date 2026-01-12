@@ -145,170 +145,8 @@ def discover_scenarios(base_folder: str) -> list[Tuple[str, str, str]]:
     return scenarios
 
 
-def load_metrics_file(path: str, use_bc: bool = False) -> pd.DataFrame:
-    """
-    Load a single metrics parquet file with data quality validation.
-
-    Args:
-        path: Path to parquet file
-        use_bc: If True and Value_BC column exists, use it as the Value column
-
-    Returns:
-        DataFrame with loaded data
-
-    Raises:
-        RuntimeError: If NaN values are found in critical columns
-    """
-    try:
-        df = pd.read_parquet(path, engine="pyarrow")
-
-        # Handle column naming: Metric -> Name
-        if 'Metric' in df.columns and 'Name' not in df.columns:
-            df = df.rename(columns={'Metric': 'Name'})
-
-        # If use_bc and Value_BC column exists, use it as Value
-        if use_bc and "Value_BC" in df.columns:
-            df["Value"] = df["Value_BC"]
-
-        # Check if we need to parse Data Type or if columns already exist
-        has_parsed_cols = all(col in df.columns for col in ['Type', 'Name', 'Location'])
-
-        if not has_parsed_cols:
-            # Need to parse Data Type column
-            if "Data Type" not in df.columns:
-                raise RuntimeError(
-                    f"Missing 'Data Type' column in {path}\n"
-                    f"Available columns: {list(df.columns)}\n"
-                    f"Expected columns: Year, Season, Data Type, Value\n"
-                    f"Please regenerate the metrics file using climateMetricsGenerator.py"
-                )
-
-            # Parse Data Type into Type, Name, Location
-            data_type_col = df["Data Type"]
-            parts = parse_data_type(data_type_col)
-
-            # Rename 'n' column to 'Name'
-            parts = parts.rename(columns={'n': 'Name'})
-
-            # Add parsed columns
-            for col in parts.columns:
-                df[col] = parts[col]
-
-        df = ensure_schema(df)
-
-        # Data quality check - NaN values should not exist in metrics files
-        critical_columns = ["Year", "Value", "Location", "Type", "Name", "Season"]
-        nan_issues = {}
-
-        for col in critical_columns:
-            if col in df.columns:
-                nan_count = df[col].isna().sum()
-                if nan_count > 0:
-                    nan_issues[col] = nan_count
-
-        if nan_issues:
-            error_msg = f"\n{'=' * 70}\n"
-            error_msg += f"DATA QUALITY ERROR: NaN values found in metrics file\n"
-            error_msg += f"{'=' * 70}\n"
-            error_msg += f"File: {path}\n\n"
-            error_msg += "NaN values found in the following columns:\n"
-            for col, count in nan_issues.items():
-                error_msg += f"  - {col}: {count} NaN values ({count / len(df) * 100:.2f}% of data)\n"
-            error_msg += f"\nTotal rows in file: {len(df)}\n"
-            error_msg += "\nThis indicates a problem with the metrics generation process.\n"
-            error_msg += "All metrics files should be complete with no missing values.\n"
-            error_msg += "Please regenerate the metrics file using climateMetricsGenerator.py\n"
-            error_msg += f"{'=' * 70}\n"
-            raise RuntimeError(error_msg)
-
-        df = df.dropna(subset=["Year"])
-
-        return df
-    except RuntimeError:
-        raise
-    except Exception as e:
-        raise RuntimeError(f"Error loading {path}: {e}")
-
-
-def load_minimal_metadata(pairs: Sequence[Tuple[str, str, float]]) -> pd.DataFrame:
-    """
-    Load minimal metadata (Year, Season, Type, Name, Location) from multiple files.
-
-    Args:
-        pairs: List of tuples (label, path, mtime)
-
-    Returns:
-        Combined DataFrame with metadata
-    """
-    frames = []
-    for label, path, mtime in pairs:
-        _ = mtime
-
-        # Load columns we need - try to get parsed columns if they exist
-        df = pd.read_parquet(path, engine="pyarrow")
-
-        # Handle column naming: Metric -> Name
-        if 'Metric' in df.columns and 'Name' not in df.columns:
-            df = df.rename(columns={'Metric': 'Name'})
-
-        # Check if we need to parse Data Type or if columns already exist
-        has_parsed_cols = all(col in df.columns for col in ['Type', 'Name', 'Location'])
-
-        if not has_parsed_cols:
-            # Need to parse Data Type column
-            if "Data Type" not in df.columns:
-                raise RuntimeError(
-                    f"Missing 'Data Type' column in {path}\n"
-                    f"Available columns: {list(df.columns)}\n"
-                    f"Please regenerate the metrics file using climateMetricsGenerator.py"
-                )
-
-            # Parse Data Type into Type, Name, Location
-            parts = parse_data_type(df["Data Type"])
-            parts = parts.rename(columns={'n': 'Name'})
-
-            # Add parsed columns
-            for col in parts.columns:
-                df[col] = parts[col]
-
-        # Keep only metadata columns
-        keep_cols = ["Year", "Season", "Type", "Name", "Location"]
-        df = df[[c for c in keep_cols if c in df.columns]].copy()
-
-        df["Scenario"] = label
-
-        # Data quality check
-        critical_columns = ["Year", "Season", "Location", "Type", "Name"]
-        nan_issues = {}
-
-        for col in critical_columns:
-            if col in df.columns:
-                nan_count = df[col].isna().sum()
-                if nan_count > 0:
-                    nan_issues[col] = nan_count
-
-        if nan_issues:
-            error_msg = f"\n{'=' * 70}\n"
-            error_msg += f"DATA QUALITY ERROR: NaN values found in metadata\n"
-            error_msg += f"{'=' * 70}\n"
-            error_msg += f"Scenario: {label}\n"
-            error_msg += f"File: {path}\n\n"
-            error_msg += "NaN values found in columns:\n"
-            for col, count in nan_issues.items():
-                error_msg += f"  - {col}: {count} NaN ({count / len(df) * 100:.2f}%)\n"
-            error_msg += f"\nTotal rows: {len(df)}\n"
-            error_msg += f"{'=' * 70}\n"
-            raise RuntimeError(error_msg)
-
-        frames.append(df)
-
-    result = pd.concat(frames, ignore_index=True)
-    result = ensure_schema(result)
-    return result.dropna(subset=["Year"])
-
-
 # ============================================================================
-# SECTION 2B: OPTIMISED DATA LOADING
+# OPTIMISED DATA LOADING
 # ============================================================================
 
 # Columns needed for the viewer (skip unused columns for faster loading)
@@ -321,13 +159,21 @@ VIEWER_COLUMNS = [
 CATEGORICAL_COLUMNS = ["Season", "Location", "Type", "Name", "Data Type", "Scenario"]
 
 
-def load_parquet_optimised(path: str, scenario_label: str) -> pd.DataFrame:
+def load_parquet_optimised(path: str, scenario_label: str,
+                           year_min: int = None, year_max: int = None) -> pd.DataFrame:
     """
     Load parquet file with optimisations.
 
     - Uses PyArrow for faster reads
     - Only loads required columns
+    - Filters by year range at read time (predicate pushdown)
     - Converts strings to categoricals
+
+    Args:
+        path: Path to parquet file
+        scenario_label: Label for this scenario
+        year_min: Minimum year to load (inclusive), None for no limit
+        year_max: Maximum year to load (inclusive), None for no limit
     """
     # Read only needed columns via PyArrow
     try:
@@ -335,20 +181,35 @@ def load_parquet_optimised(path: str, scenario_label: str) -> pd.DataFrame:
         parquet_file = pq.ParquetFile(path)
         available_cols = parquet_file.schema.names
 
-        # Select only columns we need that exist in the file
-        cols_to_read = [c for c in VIEWER_COLUMNS if c in available_cols]
+        # Build list of columns to read
+        cols_to_read = []
+        for col in VIEWER_COLUMNS:
+            if col in available_cols:
+                cols_to_read.append(col)
+            elif col == 'Name' and 'Metric' in available_cols:
+                # Handle Metric -> Name rename
+                cols_to_read.append('Metric')
 
-        # Handle column name variants
-        if 'Metric' in available_cols and 'Name' not in available_cols:
-            cols_to_read = [c if c != 'Name' else 'Metric' for c in cols_to_read]
+        # Build year filter for predicate pushdown
+        filters = None
+        if year_min is not None and year_max is not None:
+            filters = [('Year', '>=', year_min), ('Year', '<=', year_max)]
+        elif year_min is not None:
+            filters = [('Year', '>=', year_min)]
+        elif year_max is not None:
+            filters = [('Year', '<=', year_max)]
 
         # Read with PyArrow (faster than pandas default)
-        table = pq.read_table(path, columns=cols_to_read)
+        table = pq.read_table(path, columns=cols_to_read, filters=filters)
         df = table.to_pandas()
 
     except Exception:
-        # Fallback to pandas
+        # Fallback to pandas (no predicate pushdown)
         df = pd.read_parquet(path, engine="pyarrow")
+        if year_min is not None:
+            df = df[df["Year"] >= year_min]
+        if year_max is not None:
+            df = df[df["Year"] <= year_max]
 
     # Rename Metric -> Name if needed
     if 'Metric' in df.columns and 'Name' not in df.columns:
@@ -366,7 +227,8 @@ def load_parquet_optimised(path: str, scenario_label: str) -> pd.DataFrame:
 
 
 @st.cache_data(show_spinner=False, ttl=3600)
-def load_all_data_cached(cache_key: str, labels: tuple, paths: tuple) -> Dict:
+def load_all_data_cached(cache_key: str, labels: tuple, paths: tuple,
+                         year_min: int = None, year_max: int = None) -> Dict:
     """
     Load all scenario data with Streamlit caching.
 
@@ -374,14 +236,16 @@ def load_all_data_cached(cache_key: str, labels: tuple, paths: tuple) -> Dict:
         cache_key: Hash of file modification times for cache invalidation
         labels: Tuple of scenario labels
         paths: Tuple of file paths (must match labels order)
+        year_min: Minimum year to load (inclusive)
+        year_max: Maximum year to load (inclusive)
 
     Returns:
-        Dict with 'df_combined' and 'baselines'
+        Dict with 'df_combined', 'baselines', 'year_range_loaded'
     """
     all_dfs = []
 
     for label, path in zip(labels, paths):
-        df = load_parquet_optimised(path, label)
+        df = load_parquet_optimised(path, label, year_min, year_max)
         all_dfs.append(df)
 
     # Combine all scenarios
@@ -403,65 +267,245 @@ def load_all_data_cached(cache_key: str, labels: tuple, paths: tuple) -> Dict:
         if baseline is not None:
             baselines[loc] = baseline
 
+    # Track what year range was loaded
+    actual_min = int(df_combined["Year"].min()) if not df_combined.empty else year_min
+    actual_max = int(df_combined["Year"].max()) if not df_combined.empty else year_max
+
     return {
         "df_combined": df_combined,
-        "baselines": baselines
+        "baselines": baselines,
+        "year_range_loaded": (actual_min, actual_max)
     }
 
 
 def load_and_process_all_data(
         labels: List[str],
-        label_to_path: Dict[str, str]
+        label_to_path: Dict[str, str],
+        year_start: int = None,
+        year_end: int = None
 ) -> Dict:
     """
-    Load all data from parquet files with optimisations.
+    Load data from parquet files with optimisations.
 
     Optimisations:
-    1. Uses PyArrow for faster parquet reads
+    1. Uses PyArrow for faster parquet reads with predicate pushdown
     2. Only loads required columns
-    3. Converts strings to categoricals (faster groupby, less memory)
-    4. Uses Streamlit's built-in caching with hash-based invalidation
+    3. Only loads years within specified range
+    4. Converts strings to categoricals (faster groupby, less memory)
+    5. Uses Streamlit's built-in caching with hash-based invalidation
+    6. Incremental loading: expands cached data when year range widens
+
+    Args:
+        labels: List of scenario labels to load
+        label_to_path: Dict mapping labels to file paths
+        year_start: Start year (inclusive), None for no limit
+        year_end: End year (inclusive), None for no limit
 
     Returns:
         - df_raw: Combined data using Value column
         - df_bc: Combined data with Value_BC -> Value
         - baselines: Pre-industrial baselines from config
+        - year_range_loaded: Tuple of (min_year, max_year) actually loaded
     """
-    # Create cache key from file modification times
+    # Create base cache key from file modification times
     cache_parts = []
     for label in sorted(labels):
         path = label_to_path[label]
         mtime = os.path.getmtime(path)
         cache_parts.append(f"{label}:{mtime}")
-    cache_parts.append("v7_optimised")
-    cache_key = hashlib.md5("|".join(cache_parts).encode()).hexdigest()[:16]
+    cache_parts.append("v8_yearrange")
+    base_cache_key = hashlib.md5("|".join(cache_parts).encode()).hexdigest()[:16]
 
-    # Load via cached function
-    # Convert to tuples for Streamlit cache (lists are not hashable)
-    sorted_labels = tuple(sorted(labels))
-    sorted_paths = tuple(label_to_path[lbl] for lbl in sorted_labels)
+    # Session state key for tracking loaded range
+    range_key = f"loaded_range_{base_cache_key}"
 
-    cached = load_all_data_cached(cache_key, sorted_labels, sorted_paths)
+    # Check if we have cached data and what range it covers
+    cached_data_key = f"cached_data_{base_cache_key}"
 
-    df_combined = cached["df_combined"]
-    baselines = cached["baselines"]
+    # Get previously loaded range from session state
+    prev_range = st.session_state.get(range_key, (None, None))
+    prev_min, prev_max = prev_range
 
-    # Create raw view (just reference the original)
-    df_raw = df_combined
+    # Determine what we need to load
+    need_full_reload = False
+    need_expansion = False
+    expand_ranges = []  # List of (min, max) ranges to load additionally
+
+    if cached_data_key not in st.session_state:
+        # No cached data - do full load
+        need_full_reload = True
+    else:
+        # Have cached data - check if range expansion needed
+        if year_start is not None and prev_min is not None and year_start < prev_min:
+            # Need earlier years
+            expand_ranges.append((year_start, prev_min - 1))
+            need_expansion = True
+        if year_end is not None and prev_max is not None and year_end > prev_max:
+            # Need later years
+            expand_ranges.append((prev_max + 1, year_end))
+            need_expansion = True
+
+    if need_full_reload:
+        # Full load with year range
+        sorted_labels = tuple(sorted(labels))
+        sorted_paths = tuple(label_to_path[lbl] for lbl in sorted_labels)
+
+        # Include year range in cache key for Streamlit cache
+        range_cache_key = f"{base_cache_key}_{year_start}_{year_end}"
+
+        cached = load_all_data_cached(range_cache_key, sorted_labels, sorted_paths,
+                                      year_start, year_end)
+
+        df_combined = cached["df_combined"]
+        baselines = cached["baselines"]
+        year_range_loaded = cached["year_range_loaded"]
+
+        # Store in session state
+        st.session_state[cached_data_key] = {
+            "df_combined": df_combined,
+            "baselines": baselines
+        }
+        st.session_state[range_key] = year_range_loaded
+
+    elif need_expansion:
+        # Load only the new ranges and append
+        existing = st.session_state[cached_data_key]
+        df_combined = existing["df_combined"]
+        baselines = existing["baselines"]
+
+        sorted_labels = tuple(sorted(labels))
+        sorted_paths = tuple(label_to_path[lbl] for lbl in sorted_labels)
+
+        for exp_min, exp_max in expand_ranges:
+            # Load the expansion range
+            exp_cache_key = f"{base_cache_key}_{exp_min}_{exp_max}"
+            expansion = load_all_data_cached(exp_cache_key, sorted_labels, sorted_paths,
+                                             exp_min, exp_max)
+
+            # Append to existing data
+            df_combined = pd.concat([df_combined, expansion["df_combined"]],
+                                    ignore_index=True)
+
+            # Ensure categoricals are preserved
+            for col in CATEGORICAL_COLUMNS:
+                if col in df_combined.columns:
+                    df_combined[col] = df_combined[col].astype('category')
+
+        # Update stored range
+        new_min = min(prev_min or year_start, year_start) if year_start else prev_min
+        new_max = max(prev_max or year_end, year_end) if year_end else prev_max
+        year_range_loaded = (new_min, new_max)
+
+        # Update session state
+        st.session_state[cached_data_key] = {
+            "df_combined": df_combined,
+            "baselines": baselines
+        }
+        st.session_state[range_key] = year_range_loaded
+
+    else:
+        # Use existing cached data (range contraction or same range)
+        existing = st.session_state[cached_data_key]
+        df_combined = existing["df_combined"]
+        baselines = existing["baselines"]
+        year_range_loaded = prev_range
+
+    # Filter to requested range (handles contraction case)
+    if year_start is not None or year_end is not None:
+        mask = pd.Series(True, index=df_combined.index)
+        if year_start is not None:
+            mask = mask & (df_combined["Year"] >= year_start)
+        if year_end is not None:
+            mask = mask & (df_combined["Year"] <= year_end)
+        df_filtered = df_combined[mask]
+    else:
+        df_filtered = df_combined
+
+    # Create raw view
+    df_raw = df_filtered
 
     # Create BC view (copy Value_BC to Value)
-    # This is the only copy we need
-    if "Value_BC" in df_combined.columns:
-        df_bc = df_combined.copy()
+    if "Value_BC" in df_filtered.columns:
+        df_bc = df_filtered.copy()
         df_bc["Value"] = df_bc["Value_BC"]
     else:
-        df_bc = df_combined
+        df_bc = df_filtered
 
     return {
         "df_raw": df_raw,
         "df_bc": df_bc,
         "baselines": baselines,
+        "year_range_loaded": year_range_loaded,
     }
+
+
+# ============================================================================
+# BACKWARDS COMPATIBILITY WRAPPERS
+# ============================================================================
+
+def load_metrics_file(path: str, use_bc: bool = False) -> pd.DataFrame:
+    """
+    Load a single metrics parquet file.
+
+    Backwards-compatible wrapper around load_parquet_optimised.
+
+    Args:
+        path: Path to parquet file
+        use_bc: If True and Value_BC column exists, use it as the Value column
+
+    Returns:
+        DataFrame with loaded data
+    """
+    df = load_parquet_optimised(path, scenario_label="")
+
+    # Remove the empty Scenario column we added
+    if "Scenario" in df.columns:
+        df = df.drop(columns=["Scenario"])
+
+    # Apply BC if requested
+    if use_bc and "Value_BC" in df.columns:
+        df["Value"] = df["Value_BC"]
+
+    # Ensure schema
+    df = ensure_schema(df)
+
+    return df
+
+
+def load_minimal_metadata(pairs: Sequence[Tuple[str, str, float]]) -> pd.DataFrame:
+    """
+    Load minimal metadata (Year, Season, Type, Name, Location) from multiple files.
+
+    Backwards-compatible wrapper using optimised loading.
+
+    Args:
+        pairs: List of tuples (label, path, mtime)
+
+    Returns:
+        Combined DataFrame with metadata
+    """
+    frames = []
+
+    for label, path, mtime in pairs:
+        _ = mtime  # Not used but kept for API compatibility
+
+        # Use optimised loader
+        df = load_parquet_optimised(path, label)
+
+        # Keep only metadata columns
+        keep_cols = ["Year", "Season", "Type", "Name", "Location", "Scenario"]
+        df = df[[c for c in keep_cols if c in df.columns]].copy()
+
+        frames.append(df)
+
+    result = pd.concat(frames, ignore_index=True)
+
+    # Ensure categoricals after concat
+    for col in CATEGORICAL_COLUMNS:
+        if col in result.columns:
+            result[col] = result[col].astype('category')
+
+    return result.dropna(subset=["Year"])
 
 
 # ============================================================================

@@ -7,8 +7,8 @@ Last Updated: 2025-12-02 14:30 AEST - Simplified, uses climate_viewer_maps modul
 
 Features:
 - Interactive map via climate_viewer_maps.create_multi_location_map()
-- Climate metrics displayed at time horizon years
-- Uses pre-processed data from main app (no calculations)
+- Climate metrics displayed in simple tables at time horizon years
+- Uses pre-processed data from main app (display only)
 """
 
 import pandas as pd
@@ -135,7 +135,7 @@ def render_dashboard_tab(
 
     Features:
     - Interactive map showing grid cells for selected locations
-    - Metric cards at time horizon years
+    - Climate metrics displayed in simple tables at time horizon years
     - Uses pre-processed data from main app (display only)
     """
     st.title(f"{EMOJI['chart']} Climate Change Dashboard")
@@ -160,41 +160,33 @@ def render_dashboard_tab(
     with st.expander("View Grid Coverage Map", expanded=True):
         loaded_locations = render_location_map(st, loc_sel)
 
-        # Dynamic legend
+        # Dynamic legend - Streamlit native
         if loaded_locations:
-            st.markdown("---")
+            st.divider()
             cols = st.columns(min(len(loaded_locations), 4))
             for idx, (loc, info) in enumerate(loaded_locations.items()):
                 with cols[idx % len(cols)]:
                     cell_text = f"{info['cells']} cells" if info['cells'] != 1 else "1 cell"
-                    st.markdown(
-                        f"<span style='color:{info['colour_hex']};font-size:20px;'>●</span> "
-                        f"**{loc}** — {cell_text}",
-                        unsafe_allow_html=True
-                    )
+                    st.caption(f"● {loc} — {cell_text}")
 
-    st.markdown("---")
+    st.divider()
 
     # ========================================================================
     # TIME HORIZON METRICS
     # ========================================================================
 
     horizons = [
-        ("Short", short_start, "#3498DB"),
-        ("Medium", mid_start, "#F39C12"),
-        ("Long", long_start, "#E74C3C"),
-        ("End", horizon_end, "#8E44AD"),
+        ("Short", short_start),
+        ("Medium", mid_start),
+        ("Long", long_start),
+        ("End", horizon_end),
     ]
 
     for loc_idx, location in enumerate(loc_sel):
         if loc_idx > 0:
-            st.markdown("---")
+            st.divider()
 
-        loc_colour = get_location_colour(location)['color']
-        st.markdown(
-            f"## <span style='color:{loc_colour};'>●</span> {location}",
-            unsafe_allow_html=True
-        )
+        st.header(f"{EMOJI['pin']} {location}")
 
         loc_data = df_all[df_all["Location"] == location]
 
@@ -205,18 +197,10 @@ def render_dashboard_tab(
         for scenario in dashboard_scenarios:
             st.subheader(f"{EMOJI['globe']} {scenario}")
 
-            cols = st.columns(4)
-            for i, (label, year, colour) in enumerate(horizons):
-                with cols[i]:
-                    st.markdown(
-                        f"<h3 style='text-align:center;color:{colour};margin:0;'>{year}</h3>"
-                        f"<p style='text-align:center;font-size:12px;font-weight:bold;margin-top:-5px;'>{label.upper()}</p>",
-                        unsafe_allow_html=True
-                    )
+            # Build table data for all metrics
+            table_rows = []
 
             for category, metrics in DASHBOARD_METRICS.items():
-                st.markdown(f"**{category}**")
-
                 for metric_type, metric_name, unit, icon, key in metrics:
                     actual_name = find_metric_name(loc_data, metric_type, metric_name)
                     display_name = actual_name.replace(" (BC)", "")
@@ -225,26 +209,29 @@ def render_dashboard_tab(
                         loc_data, metric_type, actual_name, scenario, short_start, location
                     )
 
-                    is_inverse = should_use_inverse_delta(metric_type, metric_name)
+                    row = {"Type": metric_type, "Metric": display_name}
 
-                    cols = st.columns(4)
+                    for label, year in horizons:
+                        value = get_value_at_year(
+                            loc_data, metric_type, actual_name, scenario, year, location
+                        )
 
-                    for i, (label, year, colour) in enumerate(horizons):
-                        with cols[i]:
-                            value = get_value_at_year(
-                                loc_data, metric_type, actual_name, scenario, year, location
-                            )
+                        if value is not None and short_term_val is not None:
+                            change = value - short_term_val
+                            change_str = f"{change:+.1f}" if change != 0 else "+0.0"
+                            row[f"{year}"] = f"{change_str}{unit} ({value:.1f})"
+                        elif value is not None:
+                            row[f"{year}"] = f"{value:.1f}{unit}"
+                        else:
+                            row[f"{year}"] = "---"
 
-                            if value is not None and short_term_val is not None:
-                                change = value - short_term_val
-                            else:
-                                change = None
+                    table_rows.append(row)
 
-                            html = format_metric_card(display_name, value, change, unit, is_inverse)
-                            st.markdown(html, unsafe_allow_html=True)
+            # Display as single DataFrame table
+            if table_rows:
+                df_table = pd.DataFrame(table_rows)
+                st.dataframe(df_table, hide_index=True, width="stretch")
 
-                st.markdown("")
-
-    st.markdown("---")
+    st.divider()
     st.caption(f"Data from {len(dashboard_scenarios)} scenario(s) across {len(loc_sel)} location(s). "
                f"Horizons: Short ({short_start}), Medium ({mid_start}), Long ({long_start}), End ({horizon_end}).")
